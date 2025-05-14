@@ -133,5 +133,6 @@ export enum ImageLinkTypeEnum {
   ChinaJsDelivr = 'ChinaJsDelivr',
   // eslint-disable-next-line no-unused-vars
   Statically = 'Statically',
-  KGWeiYanCC = 'KG.WeiYan.CC'
+  KGWYCC = 'KGWYCC',
+  KGWYTech = 'KGWYTech'
 }

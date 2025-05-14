@@ -34,7 +34,7 @@ const initSettings: UserSettingsModel = {
   },
   elementPlusSize: ElementPlusSizeEnum.default,
   imageLinkType: {
-    selected: ImageLinkTypeEnum.KGWeiYanCC,
+    selected: ImageLinkTypeEnum.KGWYTech,
     presetList: {
       // GitHubPages
       [`${ImageLinkTypeEnum.GitHubPages}`]: {
@@ -66,11 +66,17 @@ const initSettings: UserSettingsModel = {
         name: ImageLinkTypeEnum.ChinaJsDelivr,
         rule: 'https://jsd.cdn.zzko.cn/gh/{{owner}}/{{repo}}@{{branch}}/{{path}}'
       },
-      // KGWeiYanCC
-      [`${ImageLinkTypeEnum.KGWeiYanCC}`]: {
+      // KGWYCC
+      [`${ImageLinkTypeEnum.KGWYCC}`]: {
 	id: getUuid(),
-	name: ImageLinkTypeEnum.KGWeiYanCC,
+	name: ImageLinkTypeEnum.KGWYCC,
 	rule: 'https://kg.weiyan.cc/{{path}}'
+      },
+      // KGWYTech
+      [`${ImageLinkTypeEnum.KGWYTech}`]: {
+	id: getUuid(),
+	name: ImageLinkTypeEnum.KGWYTech,
+	rule: 'https://kg.weiyan.tech/{{path}}'
       }
     }  
   },
