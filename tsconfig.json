@@ -10,8 +10,7 @@
     "esModuleInterop": true,
     "lib": ["esnext", "dom"],
     "types": [
-      "vite/client",
-      "vite-plugin-pwa/client"
+      "node"
     ],
     "typeRoots": [
       "./node_modules/@types/"
