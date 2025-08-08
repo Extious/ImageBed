@@ -11,28 +11,24 @@ $infoBarHeight = 50rem
     padding-top $infoBarHeight
 
     .top {
-      position absolute
-      top 0
-      left 0
+      position relative
+      box-sizing border-box
       display flex
       align-items center
       justify-content space-between
-      box-sizing border-box
       width 100%
-      height $infoBarHeight
-      padding-bottom 20rem
-      font-size 14rem
+      height 30rem
+      padding-bottom 10rem
 
-      .right {
-
-        .btn-icon {
-          margin-left 10rem
-          font-size 22rem
-          cursor pointer
-        }
+      .btn-icon {
+        font-size 22rem
+        cursor pointer
       }
     }
 
+    .tag-filter-wrapper {
+      margin-bottom 10rem
+    }
 
     .bottom {
       position relative

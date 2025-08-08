@@ -76,6 +76,7 @@ import { batchCopyImageLinks, copyImageLink, getOSName } from '@/utils'
 import { generateUploadImageObject } from './upload-image.util'
 import { uploadImagesToGitHub, uploadImageToGitHub } from '@/utils/upload-utils'
 import UploadImageCard from './components/upload-image-card/upload-image-card.vue'
+import { initializeTagsData } from '@/utils/tags-utils'
 
 const store = useStore()
 const router = useRouter()
@@ -251,7 +252,8 @@ const registerShortcuts = () => {
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await initializeTagsData(userConfigInfo)
   registerShortcuts()
 })
 </script>

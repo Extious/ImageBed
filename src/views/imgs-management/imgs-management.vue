@@ -17,15 +17,20 @@
         </div>
       </div>
 
+      <!-- 标签筛选区域 -->
+      <div class="tag-filter-wrapper" v-if="showTagFilter">
+        <tag-filter v-model="selectedTags" />
+      </div>
+
       <div
         class="bottom"
         v-loading="loadingImageList"
         :element-loading-text="$t('management.loadingTxt1')"
       >
         <image-selector
-          v-if="currentPathImageList.length"
-          :currentDirImageList="currentPathImageList"
-          @update:initImageList="currentPathImageList"
+          v-if="filteredImageList.length"
+          :currentDirImageList="filteredImageList"
+          @update:initImageList="filteredImageList"
           :key="renderKey"
         ></image-selector>
         <ul
@@ -49,7 +54,7 @@
           <div style="width: 100%" />
           <li
             class="image-management-item image"
-            v-for="(image, index) in currentPathImageList"
+            v-for="(image, index) in filteredImageList"
             :key="'image-card-' + index"
             v-contextmenu="{ type: ContextmenuEnum.img, img: image }"
           >
@@ -72,7 +77,9 @@ import ImageCard from '@/components/image-card/image-card.vue'
 import SelectedInfoBar from '@/components/selected-info-bar/selected-info-bar.vue'
 import FolderCard from '@/components/folder-card/folder-card.vue'
 import ImageSelector from '@/components/image-selector/image-selector.vue'
+import TagFilter from '@/components/tag-filter/tag-filter.vue'
 import { UploadedImageModel, DirModeEnum, ContextmenuEnum } from '@/common/model'
+import { initializeTagsData } from '@/utils/tags-utils'
 
 const store = useStore()
 const router = useRouter()
@@ -86,8 +93,28 @@ const loadingImageList = ref(false)
 
 const currentPathDirList = ref([])
 const currentPathImageList = ref([])
+const selectedTags = ref<string[]>([]) // 选中的标签
 
 const isShowBatchTools = ref(false)
+
+// 是否显示标签筛选器
+const showTagFilter = computed(() => {
+  const allTags = store.getters.getAllTags
+  return allTags && allTags.length > 0
+})
+
+// 根据标签筛选后的图片列表
+const filteredImageList = computed(() => {
+  if (selectedTags.value.length === 0) {
+    return currentPathImageList.value
+  }
+  
+  return currentPathImageList.value.filter((image: UploadedImageModel) => {
+    const imageTags = store.getters.getImageTags(image.path) || []
+    // 检查图片是否包含所有选中的标签
+    return selectedTags.value.every(tag => imageTags.includes(tag))
+  })
+})
 
 async function dirContentHandle(dir: string) {
   loadingImageList.value = true
@@ -145,7 +172,8 @@ async function reloadCurrentDirContent() {
   loadingImageList.value = false
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await initializeTagsData(userConfigInfo)
   initDirImageList()
 })
 
@@ -184,7 +212,7 @@ watch(
 watch(
   () => currentPathImageList.value,
   (nv: UploadedImageModel[]) => {
-    isShowBatchTools.value = nv.filter((x) => x.checked).length > 0
+    isShowBatchTools.value = filteredImageList.value.filter((x) => x.checked).length > 0
   },
   { deep: true }
 )
