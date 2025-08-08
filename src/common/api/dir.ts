@@ -23,7 +23,7 @@ export const getDirInfoList = (userConfigInfo: UserConfigInfoModel, path: string
     if (tmpList && tmpList.length) {
       resolve(
         tmpList
-          .filter((v: any) => v.type === 'dir')
+          .filter((v: any) => v.type === 'dir' && !(v.name || '').startsWith('.'))
           .map((x: any) => ({
             value: x.name,
             label: x.name
@@ -57,7 +57,7 @@ export const getRepoPathContent = (userConfigInfo: UserConfigInfoModel, path: st
 
     if (res && res.length) {
       res
-        .filter((v: any) => v.type === 'dir')
+        .filter((v: any) => v.type === 'dir' && !(v.name || '').startsWith('.'))
         .forEach((x: any) => store.dispatch('DIR_IMAGE_LIST_ADD_DIR', x.path))
 
       setTimeout(() => {

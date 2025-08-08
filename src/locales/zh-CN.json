@@ -278,4 +278,15 @@
     "text_11": "安装 PicX GitHub APP",
     "text_12": "创建 GitHub Token"
   }
+  ,
+  "tags": {
+    "editTags": "编辑标签",
+    "addTag": "添加标签",
+    "suggestions": "常用标签",
+    "filter": "标签筛选",
+    "clearFilter": "清除筛选",
+    "noTags": "暂无标签",
+    "updateSuccess": "标签更新成功",
+    "updateFailed": "标签更新失败"
+  }
 }

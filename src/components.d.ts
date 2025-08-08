@@ -31,6 +31,7 @@ declare module '@vue/runtime-core' {
     ElDropdown: typeof import('element-plus/es')['ElDropdown']
     ElDropdownItem: typeof import('element-plus/es')['ElDropdownItem']
     ElDropdownMenu: typeof import('element-plus/es')['ElDropdownMenu']
+    ElEmpty: typeof import('element-plus/es')['ElEmpty']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElIcon: typeof import('element-plus/es')['ElIcon']
@@ -79,6 +80,8 @@ declare module '@vue/runtime-core' {
     RouterView: typeof import('vue-router')['RouterView']
     SelectedInfoBar: typeof import('./components/selected-info-bar/selected-info-bar.vue')['default']
     SiteCount: typeof import('./components/site-count/site-count.vue')['default']
+    TagFilter: typeof import('./components/tag-filter/tag-filter.vue')['default']
+    TagInput: typeof import('./components/tag-input/tag-input.vue')['default']
     WatermarkConfigBox: typeof import('./components/watermark-config-box/watermark-config-box.vue')['default']
     WatermarkTool: typeof import('./components/tools/watermark-tool/watermark-tool.vue')['default']
   }

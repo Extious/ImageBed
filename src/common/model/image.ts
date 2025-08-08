@@ -11,6 +11,7 @@ export interface UploadedImageModel {
   size: number
   deleting: boolean
   checked: boolean
+  tags?: string[] // 图片标签数组
 }
 
 /**
@@ -63,6 +64,8 @@ export interface UploadImageModel {
     path: string
     dir: string
   }
+
+  tags?: string[] // 图片标签数组
 }
 
 /**

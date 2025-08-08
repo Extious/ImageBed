@@ -277,5 +277,15 @@
     "text_10": "檢視教學",
     "text_11": "安裝 PicX GitHub APP",
     "text_12": "建立 GitHub Token"
+  },
+  "tags": {
+    "editTags": "編輯標籤",
+    "addTag": "新增標籤",
+    "suggestions": "常用標籤",
+    "filter": "標籤篩選",
+    "clearFilter": "清除篩選",
+    "noTags": "暫無標籤",
+    "updateSuccess": "標籤更新成功",
+    "updateFailed": "標籤更新失敗"
   }
 }

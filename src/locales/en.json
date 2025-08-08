@@ -276,5 +276,15 @@
     "text_10": "View tutorial",
     "text_11": "Install PicX GitHub APP",
     "text_12": "Create GitHub Token"
+  },
+  "tags": {
+    "editTags": "Edit tags",
+    "addTag": "Add tag",
+    "suggestions": "Suggestions",
+    "filter": "Tag filter",
+    "clearFilter": "Clear filter",
+    "noTags": "No tags",
+    "updateSuccess": "Tags updated successfully",
+    "updateFailed": "Failed to update tags"
   }
 }

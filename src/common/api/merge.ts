@@ -55,7 +55,9 @@ export const createRef = (owner: string, repo: string, branch: string, sha: stri
     url: `/repos/${owner}/${repo}/git/refs/heads/${branch}`,
     method: 'PATCH',
     params: {
-      sha
+      sha,
+      // 避免非 fast-forward 堵塞提交（例如并发或外部更新导致 head 前移）
+      force: true
     }
   })
 }

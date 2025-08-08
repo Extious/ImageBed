@@ -26,18 +26,21 @@ const getInnerText = (dom: any, isuv: boolean) => {
 }
 
 onMounted(() => {
-  const script: any = document.createElement('script')
-  script.async = true
-  script.src = '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
-  siteCountDom.value.appendChild(script)
+  // Only load busuanzi script in production environment
+  if (import.meta.env.MODE === 'production') {
+    const script: any = document.createElement('script')
+    script.async = true
+    script.src = '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
+    siteCountDom.value.appendChild(script)
 
-  script.onload = () => {
-    const tempT = setTimeout(() => {
-      if (getInnerText(siteCountDom.value, props.isuv)) {
-        isShow.value = true
-      }
-      clearTimeout(tempT)
-    }, 1500)
+    script.onload = () => {
+      const tempT = setTimeout(() => {
+        if (getInnerText(siteCountDom.value, props.isuv)) {
+          isShow.value = true
+        }
+        clearTimeout(tempT)
+      }, 1500)
+    }
   }
 })
 </script>

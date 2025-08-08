@@ -27,6 +27,7 @@ export const generateUploadImageObject = (obj: {
   tmp.uuid = obj.uuid
   tmp.base64.originalBase64 = obj.base64
   tmp.fileInfo.originalFile = obj.file
+  tmp.tags = [] // 初始化标签为空数组
 
   const { imageName } = userSettings
 

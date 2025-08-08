@@ -124,6 +124,10 @@
           {{ formatDatetime('yyyy-MM-dd hh:mm', imgObj.fileInfo.originalFile?.lastModified) }}
         </span>
       </div>
+      <!-- 标签输入区域 -->
+      <div class="img-tags-box" v-if="imgObj.uploadStatus.progress === 0">
+        <tag-input v-model="imgObj.tags" :max-tags="10" />
+      </div>
     </div>
 
     <div
@@ -169,6 +173,7 @@ import { getFileSize } from '@/utils/file-utils'
 import { formatDatetime } from '@/utils/common-utils'
 import { hashRename, initImgSettings, prefixNamingTrans, rename } from './upload-image-card.util'
 import { RENAME_MAX_LENGTH } from '@/common/constant'
+import TagInput from '@/components/tag-input/tag-input.vue'
 
 const store = useStore()
 const instance = getCurrentInstance()

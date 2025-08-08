@@ -6,9 +6,11 @@ import {
   createTree,
   uploadSingleImage,
   uploadImageBlob,
-  getBranchInfo
+  getBranchInfo,
+  getFileInfo
 } from '@/common/api'
 import { PICX_UPLOAD_IMG_DESC } from '@/common/constant'
+import { updateImageTags } from '@/utils/tags-utils'
 
 /**
  * 图片上传成功之后的处理
@@ -16,7 +18,7 @@ import { PICX_UPLOAD_IMG_DESC } from '@/common/constant'
  * @param img
  * @param userConfigInfo
  */
-const uploadedHandle = (
+const uploadedHandle = async (
   res: { name: string; sha: string; path: string; size: number },
   img: UploadImageModel,
   userConfigInfo: UserConfigInfoModel
@@ -40,7 +42,8 @@ const uploadedHandle = (
     sha: res.sha,
     path: res.path,
     deleting: false,
-    size: res.size
+    size: res.size,
+    tags: img.tags || [] // 添加标签
   }
 
   img.uploadedImg = uploadedImg
@@ -50,6 +53,11 @@ const uploadedHandle = (
 
   // dirImageList 增加图片
   store.dispatch('DIR_IMAGE_LIST_ADD_IMAGE', uploadedImg)
+
+  // 如果有标签，保存到 GitHub
+  if (img.tags && img.tags.length > 0) {
+    await updateImageTags(userConfigInfo, res.path, img.tags)
+  }
 }
 
 /**
@@ -133,9 +141,9 @@ export async function uploadImagesToGitHub(
     return Promise.resolve(false)
   }
 
-  blobs.forEach((blob: any) => {
+  blobs.forEach(async (blob: any) => {
     const name = blob.img.filename.final
-    uploadedHandle(
+    await uploadedHandle(
       { name, sha: blob.sha, path: `${finalPath}${name}`, size: 0 },
       blob.img,
       userConfigInfo
@@ -153,7 +161,7 @@ export function uploadImageToGitHub(
   userConfigInfo: UserConfigInfoModel,
   img: UploadImageModel
 ): Promise<Boolean> {
-  const { selectedBranch: branch, email, owner } = userConfigInfo
+  const { selectedBranch: branch, email, owner, selectedDir } = userConfigInfo
 
   const data: any = {
     message: PICX_UPLOAD_IMG_DESC,
@@ -176,12 +184,26 @@ export function uploadImageToGitHub(
 
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve) => {
+    // 如果目标路径已存在，需要带上 sha 进行更新，避免 422 fast-forward 错误
+    let filePath = img.filename.final
+    if (selectedDir !== '/') {
+      filePath = `${selectedDir}/${img.filename.final}`
+    }
+    if (img?.reUploadInfo?.isReUpload && img.reUploadInfo.path) {
+      filePath = img.reUploadInfo.path
+    }
+
+    const existing = await getFileInfo(userConfigInfo, filePath)
+    if (existing && existing.sha) {
+      data.sha = existing.sha
+    }
+
     const uploadRes = await uploadSingleImage(uploadUrlHandle(userConfigInfo, img), data)
     console.log('uploadSingleImage >> ', uploadRes)
     img.uploadStatus.uploading = false
     if (uploadRes) {
       const { name, sha, path, size } = uploadRes.content
-      uploadedHandle({ name, sha, path, size }, img, userConfigInfo)
+      await uploadedHandle({ name, sha, path, size }, img, userConfigInfo)
       resolve(true)
     } else {
       resolve(false)

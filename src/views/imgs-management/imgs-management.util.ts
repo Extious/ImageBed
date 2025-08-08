@@ -36,7 +36,7 @@ export const getDirContent = (dirPath: string, dirObj: DirObject) => {
  */
 export const filterDirContent = (dirPath: string, content: any, type: string): any => {
   if (type === 'dir') {
-    return content.childrenDirs?.filter((x: any) => x.type === 'dir')
+    return content.childrenDirs?.filter((x: any) => x.type === 'dir' && !(x.dir || '').startsWith('.'))
   }
 
   if (type === 'image') {

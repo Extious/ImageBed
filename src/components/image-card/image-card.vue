@@ -38,6 +38,17 @@
         <!-- 文件名 -->
         <div class="filename" v-else>{{ imageObj.name }}</div>
       </div>
+      <!-- 标签显示 -->
+      <div class="image-tags" v-if="imageTags.length > 0">
+        <el-tag
+          v-for="tag in imageTags"
+          :key="tag"
+          size="small"
+          class="tag-item"
+        >
+          {{ tag }}
+        </el-tag>
+      </div>
     </div>
 
     <!-- 图片链接操作 -->
@@ -68,6 +79,9 @@
               <el-dropdown-item @click.self="showRenameInput(imageObj)">
                 {{ $t('upload.rename') }}
               </el-dropdown-item>
+              <el-dropdown-item @click="editTags(imageObj)">
+                {{ $t('tags.editTags') || '编辑标签' }}
+              </el-dropdown-item>
               <el-dropdown-item @click="viewImageProperties(imageObj)">
                 {{ $t('management.property') }}
               </el-dropdown-item>
@@ -80,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance, ref } from 'vue'
+import { computed, getCurrentInstance, ref, h } from 'vue'
 import type { ElInput } from 'element-plus'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/stores'
@@ -98,6 +112,8 @@ import {
 import { uploadImageToGitHub } from '@/utils/upload-utils'
 import { deleteSingleImage } from '@/common/api'
 import { RENAME_MAX_LENGTH } from '@/common/constant'
+import { updateImageTags, removeImageTags } from '@/utils/tags-utils'
+import TagInput from '@/components/tag-input/tag-input.vue'
 
 const props = defineProps({
   imageObj: {
@@ -121,6 +137,11 @@ const isManagementPage = computed(() => {
 })
 
 const imgUrl = computed(() => generateImageLinks(props.imageObj, userConfigInfo, userSettings))
+
+// 获取图片的标签
+const imageTags = computed(() => {
+  return store.getters.getImageTags(props.imageObj.path) || []
+})
 
 const renameInputRef = ref<InstanceType<typeof ElInput>>()
 const renameInputValue = ref<string>('')
@@ -149,6 +170,12 @@ const deleteOriginImage = (
       } else {
         ElMessage.success({ message: instance?.proxy?.$t('management.message5') })
       }
+      
+      // 删除图片的标签数据
+      if (!isRename) {
+        await removeImageTags(userConfigInfo, imageObj.path)
+      }
+      
       await store.dispatch('DIR_IMAGE_LIST_REMOVE', imageObj)
       await store.dispatch('UPLOAD_IMG_LIST_REMOVE', imageObj.uuid)
       resolve(true)
@@ -249,6 +276,12 @@ const updateRename = async () => {
       const isUploadSuccess = await uploadImageToGitHub(userConfigInfo, tmpImgObj)
 
       if (isUploadSuccess) {
+        // 如果原图片有标签，转移到新图片
+        const oldTags = imageTags.value
+        if (oldTags.length > 0) {
+          await updateImageTags(userConfigInfo, tmpImgObj.reUploadInfo!.path, oldTags)
+        }
+        
         renameInputValue.value = ''
         await deleteOriginImage(imageObj, true)
         await store.dispatch('UPLOAD_IMG_LIST_REMOVE', imageObj.uuid)
@@ -302,6 +335,52 @@ const viewImageProperties = (imgObj: UploadedImageModel) => {
       type: 'info'
     }
   )
+}
+
+/**
+ * 编辑图片标签
+ * @param imgObj
+ */
+const editTags = (imgObj: UploadedImageModel) => {
+  const currentTags = [...imageTags.value]
+  
+  ElMessageBox({
+    title: instance?.proxy?.$t('tags.editTags') || '编辑标签',
+    message: () => h(TagInput, {
+      modelValue: currentTags,
+      'onUpdate:modelValue': (val: string[]) => {
+        currentTags.length = 0
+        currentTags.push(...val)
+      }
+    }),
+    showCancelButton: true,
+    confirmButtonText: instance?.proxy?.$t('confirm') || '确定',
+    cancelButtonText: instance?.proxy?.$t('cancel') || '取消',
+    beforeClose: async (action, messageBoxInstance, done) => {
+      if (action === 'confirm') {
+        const loading = ElLoading.service({
+          lock: true,
+          text: instance?.proxy?.$t('loading') || '保存中...'
+        })
+        
+        const success = await updateImageTags(userConfigInfo, imgObj.path, currentTags)
+        loading.close()
+        
+        if (success) {
+          ElMessage.success({
+            message: instance?.proxy?.$t('tags.updateSuccess') || '标签更新成功'
+          })
+          done()
+        } else {
+          ElMessage.error({
+            message: instance?.proxy?.$t('tags.updateFailed') || '标签更新失败'
+          })
+        }
+      } else {
+        done()
+      }
+    }
+  })
 }
 </script>
 
