@@ -10,7 +10,6 @@ import toolboxImageListModule from './modules/toolbox-image-list'
 import uploadImageListModule from './modules/upload-image-list'
 import githubAuthorizeModule from './modules/github-authorize'
 import tagsModule from './modules/tags'
-import tagsModule from './modules/tags'
 
 // Create a new store instance.
 export const store = createStore<RootStateTypes>({

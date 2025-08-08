@@ -94,6 +94,7 @@ export async function uploadImagesToGitHub(
   const { selectedBranch: branch, selectedRepo: repo, selectedDir, owner } = userConfigInfo
 
   const blobs = []
+  let anyBlobFailed = false
   // eslint-disable-next-line no-restricted-syntax
   for (const img of imgs) {
     img.uploadStatus.uploading = true
@@ -103,8 +104,19 @@ export async function uploadImagesToGitHub(
       blobs.push({ img, ...blobRes })
     } else {
       img.uploadStatus.uploading = false
-      ElMessage.error(`${img.filename.final} 上传失败`)
+      anyBlobFailed = true
+      ElMessage.error(`${img.filename.final} upload failed`)
     }
+  }
+
+  // 如果 blobs 全部失败或存在失败，走 Contents API 逐个上传的兜底方案
+  if (anyBlobFailed || blobs.length === 0) {
+    let allOk = true
+    for (const img of imgs) {
+      const ok = await uploadImageToGitHub(userConfigInfo, img)
+      allOk = allOk && !!ok
+    }
+    return Promise.resolve(allOk)
   }
 
   // 获取 head，用于获取当前分支信息（根目录的 tree sha 以及 head commit sha）

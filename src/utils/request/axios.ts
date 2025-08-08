@@ -10,6 +10,7 @@ const axios = Axios.create({
 })
 
 axios.defaults.headers['Content-Type'] = 'application/json'
+axios.defaults.headers['Accept'] = 'application/vnd.github.v3+json'
 
 // 发起请求之前的拦截器（前置拦截）
 axios.interceptors.request.use(

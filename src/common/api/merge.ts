@@ -9,18 +9,22 @@ import { PICX_UPLOAD_IMGS_DESC } from '@/common/constant'
  * @param head
  */
 export const createTree = (owner: string, repo: string, blobs: any[], head: any) => {
+  const body: any = {
+    tree: blobs.map((blob: any) => ({
+      path: blob.path,
+      mode: '100644',
+      type: 'blob',
+      sha: blob.sha
+    }))
+  }
+  const baseTree = head?.commit?.commit?.tree?.sha
+  if (baseTree) {
+    body.base_tree = baseTree
+  }
   return request({
     url: `/repos/${owner}/${repo}/git/trees`,
     method: 'POST',
-    params: {
-      tree: blobs.map((blob: any) => ({
-        path: blob.path,
-        mode: '100644',
-        type: 'blob',
-        sha: blob.sha
-      })),
-      base_tree: head?.commit?.commit?.tree?.sha || null
-    }
+    params: body
   })
 }
 

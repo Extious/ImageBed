@@ -103,8 +103,7 @@ const initSetLanguage = () => {
   // 初始化设置
   setLanguage(userSettings.language)
 
-  // 根据 IP 自动设置
-  setLanguageByIP()
+  // 关闭基于 IP 的自动语言请求，避免外部服务 CORS/429 报错
 }
 
 const init = () => {

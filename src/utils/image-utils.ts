@@ -6,6 +6,7 @@ import {
 } from '@/common/model'
 import { getUuid } from '@/utils/common-utils'
 import { store } from '@/stores'
+import { removeImageTags } from '@/utils/tags-utils'
 import { createCommit, createRef, createTree, deleteSingleImage, getBranchInfo } from '@/common/api'
 import request from '@/utils/request'
 
@@ -91,6 +92,8 @@ export async function deleteImageFromGitHub(
     imageObj.deleting = false
     if (res) {
       resolve(true)
+      // 删除对应的标签数据
+      await removeImageTags(userConfigInfo, imageObj.path)
       await store.dispatch('UPLOAD_IMG_LIST_REMOVE', imageObj.uuid)
       await store.dispatch('DIR_IMAGE_LIST_REMOVE', imageObj)
     } else {
@@ -156,6 +159,10 @@ export async function deleteImagesFromGitHub(
 
   imgObjs.forEach((imgObj) => {
     imgObj.deleting = false
+    // 删除对应的标签数据
+    // 串行或并行都可，内部 saveTagsToGitHub 自带队列，此处无需额外队列
+    // 这里使用 then 以避免 forEach 中 await 带来的额外复杂性
+    removeImageTags(userConfigInfo, imgObj.path)
     store.dispatch('UPLOAD_IMG_LIST_REMOVE', imgObj.uuid)
     store.dispatch('DIR_IMAGE_LIST_REMOVE', imgObj)
   })

@@ -19,7 +19,7 @@
 
       <!-- 标签筛选区域 -->
       <div class="tag-filter-wrapper">
-        <tag-filter v-model="selectedTags" />
+        <tag-filter v-model="selectedTags" :visiblePaths="currentPathImageList.map((x:any)=>x.path)" />
       </div>
 
       <div
@@ -27,12 +27,20 @@
         v-loading="loadingImageList"
         :element-loading-text="$t('management.loadingTxt1')"
       >
+        <template v-if="loadError">
+          <el-result icon="warning" :title="$t('error') || 'Error'" :sub-title="loadError">
+            <template #extra>
+              <el-button type="primary" @click="reloadCurrentDirContent">{{ $t('reload') || 'Reload' }}</el-button>
+            </template>
+          </el-result>
+        </template>
         <image-selector
-          v-if="filteredImageList.length"
+          v-if="!loadError && filteredImageList.length"
           :currentDirImageList="filteredImageList"
           @update:initImageList="filteredImageList"
           :key="renderKey"
         ></image-selector>
+        <el-empty v-if="!loadError && !filteredImageList.length && !currentPathDirList.length && !loadingImageList" :description="$t('management.noData') || 'No data'" />
         <ul
           class="image-management-list"
           :style="{
@@ -79,7 +87,7 @@ import FolderCard from '@/components/folder-card/folder-card.vue'
 import ImageSelector from '@/components/image-selector/image-selector.vue'
 import TagFilter from '@/components/tag-filter/tag-filter.vue'
 import { UploadedImageModel, DirModeEnum, ContextmenuEnum } from '@/common/model'
-import { initializeTagsData } from '@/utils/tags-utils'
+import { initializeTagsData, reconcileTagsForDir, refreshTagsFromGitHub } from '@/utils/tags-utils'
 
 const store = useStore()
 const router = useRouter()
@@ -90,6 +98,7 @@ const dirObject = computed(() => store.getters.getDirObject).value
 
 const renderKey = ref(new Date().getTime()) // key for update image-selector component
 const loadingImageList = ref(false)
+const loadError = ref<string>('')
 
 const currentPathDirList = ref([])
 const currentPathImageList = ref([])
@@ -114,22 +123,23 @@ const filteredImageList = computed(() => {
   })
 })
 
+// 对齐标签的防抖定时器
+let reconcileTimer: ReturnType<typeof setTimeout> | null = null
+
 async function dirContentHandle(dir: string) {
   loadingImageList.value = true
-
-  const dirContent = getDirContent(dir, dirObject)
-  if (dirContent) {
-    const dirs = filterDirContent(dir, dirContent, 'dir')
-    const images = filterDirContent(dir, dirContent, 'image')
-    if (!dirs.length && !images.length) {
-      await getRepoPathContent(userConfigInfo, dir)
-    } else {
-      currentPathDirList.value = dirs
-      currentPathImageList.value = images
-      store.commit('REPLACE_IMAGE_CARD', { checkedImgArr: currentPathImageList.value })
+  loadError.value = ''
+  // 始终清空并重新拉取，避免使用本地缓存导致列表滞后
+  try {
+    await store.dispatch('DIR_IMAGE_LIST_INIT_DIR', dir)
+    const ok = await getRepoPathContent(userConfigInfo, dir)
+    if (!ok) {
+      loadError.value = 'No content or not deployed'
     }
-  } else {
-    await getRepoPathContent(userConfigInfo, dir)
+    // 拉取最新标签，保证新增标签可见
+    await refreshTagsFromGitHub(userConfigInfo)
+  } catch (e: any) {
+    loadError.value = e?.message || 'Load failed'
   }
   loadingImageList.value = false
 }
@@ -202,6 +212,12 @@ watch(
       currentPathDirList.value = filterDirContent(viewDir, dirContent, 'dir')
       currentPathImageList.value = filterDirContent(viewDir, dirContent, 'image')
       store.commit('REPLACE_IMAGE_CARD', { checkedImgArr: currentPathImageList.value })
+      // 防抖对齐当前目录标签数据，剔除已删图片的标签
+      if (reconcileTimer) clearTimeout(reconcileTimer)
+      reconcileTimer = setTimeout(() => {
+        const validPaths = currentPathImageList.value.map((img: UploadedImageModel) => img.path)
+        reconcileTagsForDir(userConfigInfo, viewDir, validPaths)
+      }, 300)
     }
   },
   { deep: true }

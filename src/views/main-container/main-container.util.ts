@@ -17,9 +17,6 @@ export const getCloudDeployInfo = async () => {
     url: `/repos/${owner}/${repo}/contents/${filename}`,
     method: 'GET',
     noShowErrorMsg: true,
-    cache: {
-      maxAge: 0
-    },
     params: {
       branch,
       timestamp: Date.now()

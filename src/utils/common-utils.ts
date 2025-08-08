@@ -23,11 +23,35 @@ export const getUuid = () => {
  * @param txt
  * @param callback
  */
-export const copyText = (txt: string, callback: any) => {
-  navigator.clipboard.writeText(txt).then(() => {
-    // eslint-disable-next-line no-unused-expressions
-    callback && callback()
-  })
+export const copyText = async (txt: string, callback?: () => void): Promise<boolean> => {
+  // 优先使用异步 Clipboard API，并在失败时回退到 execCommand
+  try {
+    // 某些浏览器在没有用户激活时会拒绝，此处捕获到后走回退逻辑
+    await navigator.clipboard.writeText(txt)
+    callback?.()
+    return true
+  } catch (_) {
+    try {
+      const textarea = document.createElement('textarea')
+      textarea.value = txt
+      textarea.setAttribute('readonly', '')
+      textarea.style.position = 'fixed'
+      textarea.style.top = '0'
+      textarea.style.left = '0'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      const ok = document.execCommand('copy')
+      document.body.removeChild(textarea)
+      if (ok) {
+        callback?.()
+        return true
+      }
+    } catch (_) {
+      // ignore
+    }
+  }
+  return false
 }
 
 /**

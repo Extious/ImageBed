@@ -136,7 +136,15 @@ const isManagementPage = computed(() => {
   return router.path === '/management'
 })
 
-const imgUrl = computed(() => generateImageLinks(props.imageObj, userConfigInfo, userSettings))
+const imgUrl = computed(() => {
+  const base = generateImageLinks(props.imageObj, userConfigInfo, userSettings)
+  if (!base) return base
+  if (isManagementPage.value) {
+    const param = `t=${props.imageObj.sha || ''}`
+    return base.includes('?') ? `${base}&${param}` : `${base}?${param}`
+  }
+  return base
+})
 
 // 获取图片的标签
 const imageTags = computed(() => {

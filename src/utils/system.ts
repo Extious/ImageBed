@@ -36,17 +36,8 @@ export const getOSName = (): 'mac' | 'win' | 'linux' | null => {
  * US 美国
  */
 export const getRegionByIP = async (): Promise<'CN' | 'HK' | 'TW' | 'SG' | 'US'> => {
-  try {
-    // 获取 IP 地址
-    const res = await axios.get('https://api.ipify.org?format=json')
-
-    // 调用 ipapi.co 查询 IP 所在的地区或国家
-    const res2 = await axios.get(`https://ipapi.co/${res.data.ip}/country/`)
-
-    return Promise.resolve(res2.data)
-  } catch (error) {
-    return Promise.resolve('CN')
-  }
+  // 为避免首次进入页面外部请求带来 CORS/429 报错，直接返回默认地区
+  return Promise.resolve('CN')
 }
 
 /**

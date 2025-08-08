@@ -11,7 +11,7 @@ export const uploadSingleImage = (url: string, data: any) => {
     url,
     method: 'PUT',
     data
-  })
+  }).then(res => res?.data || res)
 }
 
 /**
@@ -24,15 +24,14 @@ export const uploadImageBlob = (img: UploadImageModel, owner: string, repo: stri
   return request({
     url: `/repos/${owner}/${repo}/git/blobs`,
     method: 'POST',
-    params: {
-      owner,
-      repo,
+    data: {
       content: (
         img.base64.compressBase64 ||
         img.base64.watermarkBase64 ||
         img.base64.originalBase64
       ).split(',')[1],
       encoding: 'base64'
-    }
+    },
+    noShowErrorMsg: true
   })
 }

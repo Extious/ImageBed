@@ -40,6 +40,7 @@ import type { TagStatistics } from '@/common/model'
 
 const props = defineProps<{
   modelValue: string[]
+  visiblePaths?: string[]
 }>()
 
 const emit = defineEmits<{
@@ -54,7 +55,21 @@ const selectedTags = computed({
 })
 
 const tagStatistics = computed<TagStatistics[]>(() => {
-  return store.getters.getTagsStatistics || []
+  const paths = props.visiblePaths || []
+  const tagsData = store.getters.getTagsData
+  if (!tagsData) return []
+
+  const tagCounts = new Map<string, number>()
+  const entries = Object.entries(tagsData.images || {})
+  entries.forEach(([path, tags]: [string, string[]]) => {
+    if (paths.length > 0) {
+      if (!paths.includes(path)) return
+    }
+    tags.forEach((t) => tagCounts.set(t, (tagCounts.get(t) || 0) + 1))
+  })
+  return Array.from(tagCounts.entries())
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count)
 })
 
 const toggleTag = (tag: string) => {

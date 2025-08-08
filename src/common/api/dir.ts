@@ -49,13 +49,17 @@ export const getRepoPathContent = (userConfigInfo: UserConfigInfoModel, path: st
       url: `/repos/${owner}/${repo}/contents/${path}`,
       method: 'GET',
       params: {
-        // 防止浏览器缓存
-        'no-cache': getUuid(),
+        // 防止缓存：加时间戳与缓存禁用指示
+        t: Date.now(),
         ref
       }
     })
 
-    if (res && res.length) {
+    if (Array.isArray(res)) {
+      // 先清空当前目录，避免重复累计
+      await store.dispatch('DIR_IMAGE_LIST_INIT_DIR', path || '/')
+
+      if (res.length) {
       res
         .filter((v: any) => v.type === 'dir' && !(v.name || '').startsWith('.'))
         .forEach((x: any) => store.dispatch('DIR_IMAGE_LIST_ADD_DIR', x.path))
@@ -67,10 +71,12 @@ export const getRepoPathContent = (userConfigInfo: UserConfigInfoModel, path: st
             store.dispatch('DIR_IMAGE_LIST_ADD_IMAGE', createManagementImageObject(x, path))
           })
       }, 120)
-
+      }
       resolve(true)
     } else {
-      resolve(null)
+      // 目录不存在或为空
+      await store.dispatch('DIR_IMAGE_LIST_INIT_DIR', path || '/')
+      resolve(false)
     }
   })
 }

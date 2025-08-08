@@ -15,15 +15,13 @@ export const getFileInfo = (userConfigInfo: UserConfigInfoModel, path: string) =
         url: `/repos/${owner}/${repo}/contents/${path}`,
         method: 'GET',
         params: {
-          ref
+          ref,
+          t: Date.now()
         }
       })
 
-      if (res) {
-        resolve(res)
-      } else {
-        resolve(null)
-      }
+      // request 已返回响应 data，本处直接返回 res
+      resolve(res || null)
     } catch (error) {
       // 如果文件不存在或请求失败，返回 null
       resolve(null)
