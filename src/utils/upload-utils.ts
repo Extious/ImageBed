@@ -9,6 +9,7 @@ import {
   getBranchInfo
 } from '@/common/api'
 import { PICX_UPLOAD_IMG_DESC } from '@/common/constant'
+import { updateImageTags } from '@/utils/tags-utils'
 
 /**
  * 图片上传成功之后的处理
@@ -16,7 +17,7 @@ import { PICX_UPLOAD_IMG_DESC } from '@/common/constant'
  * @param img
  * @param userConfigInfo
  */
-const uploadedHandle = (
+const uploadedHandle = async (
   res: { name: string; sha: string; path: string; size: number },
   img: UploadImageModel,
   userConfigInfo: UserConfigInfoModel
@@ -40,7 +41,8 @@ const uploadedHandle = (
     sha: res.sha,
     path: res.path,
     deleting: false,
-    size: res.size
+    size: res.size,
+    tags: img.tags || [] // 添加标签
   }
 
   img.uploadedImg = uploadedImg
@@ -50,6 +52,11 @@ const uploadedHandle = (
 
   // dirImageList 增加图片
   store.dispatch('DIR_IMAGE_LIST_ADD_IMAGE', uploadedImg)
+
+  // 如果有标签，保存到 GitHub
+  if (img.tags && img.tags.length > 0) {
+    await updateImageTags(userConfigInfo, res.path, img.tags)
+  }
 }
 
 /**
@@ -133,9 +140,9 @@ export async function uploadImagesToGitHub(
     return Promise.resolve(false)
   }
 
-  blobs.forEach((blob: any) => {
+  blobs.forEach(async (blob: any) => {
     const name = blob.img.filename.final
-    uploadedHandle(
+    await uploadedHandle(
       { name, sha: blob.sha, path: `${finalPath}${name}`, size: 0 },
       blob.img,
       userConfigInfo
@@ -181,7 +188,7 @@ export function uploadImageToGitHub(
     img.uploadStatus.uploading = false
     if (uploadRes) {
       const { name, sha, path, size } = uploadRes.content
-      uploadedHandle({ name, sha, path, size }, img, userConfigInfo)
+      await uploadedHandle({ name, sha, path, size }, img, userConfigInfo)
       resolve(true)
     } else {
       resolve(false)
