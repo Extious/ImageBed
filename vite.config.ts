@@ -15,11 +15,19 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
 
   return {
     plugins: createVitePlugins(viteEnv, isBuild),
+    define: {
+      'process.env.NODE_ENV': JSON.stringify(mode)
+    },
     resolve: {
       alias: [
         {
           find: '@',
           replacement: '/src'
+        },
+        {
+          // 仅替换裸模块导入，避免对子路径造成影响
+          find: /^@yireen\/squoosh-browser$/, 
+          replacement: '@yireen/squoosh-browser/dist/client/lazy-app/Compress/index.js'
         },
         {
           find: 'vue-i18n',
@@ -28,6 +36,18 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       ]
     },
     css: {
+      postcss: {
+        plugins: [
+          {
+            postcssPlugin: 'remove-charset',
+            AtRule: {
+              charset: (atRule: any) => {
+                atRule.remove()
+              }
+            }
+          }
+        ]
+      },
       preprocessorOptions: {
         stylus: {
           // 引入 variables.styl 文件
@@ -41,7 +61,20 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     },
     base: './', // 设置打包路径
     optimizeDeps: {
-      exclude: ['@yireen/squoosh-browser']
+      exclude: [
+        '@yireen/squoosh-browser',
+        '@yireen/squoosh-browser/dist/client/lazy-app/Compress/index.js',
+        '@yireen/squoosh-browser/dist/client/lazy-app/feature-meta'
+      ],
+      esbuildOptions: {
+        sourcemap: false,
+        format: 'esm'
+      },
+      include: [],
+      force: true
+    },
+    ssr: {
+      noExternal: ['@yireen/squoosh-browser']
     },
     server: {
       port: 4000,
@@ -49,6 +82,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       cors: true
     },
     build: {
+      chunkSizeWarningLimit: 2000,
       minify: 'terser', // 启用 terser 压缩
       terserOptions: {
         compress: {
