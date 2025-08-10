@@ -8,7 +8,6 @@
 import { onMounted, ref, getCurrentInstance, watch, computed } from 'vue'
 import { ElConfigProvider } from 'element-plus'
 import zhCN from 'element-plus/lib/locale/lang/zh-cn'
-import zhTW from 'element-plus/lib/locale/lang/zh-tw'
 import en from 'element-plus/lib/locale/lang/en'
 import setThemeMode from '@/utils/set-theme-mode'
 import { useStore } from '@/stores'
@@ -22,7 +21,7 @@ const instance = getCurrentInstance()
 const store = useStore()
 const userSettings = computed(() => store.getters.getUserSettings).value
 const elementPlusSize = ref<ElementPlusSizeEnum>(ElementPlusSizeEnum.default)
-const elementPlusLocale = ref(zhCN) // zhCN | zhTW | en
+const elementPlusLocale = ref(zhCN) // zhCN | en
 
 const elementPlusSizeHandle = (width: number) => {
   if (width <= 600) {
@@ -47,9 +46,6 @@ const setLanguage = (language: LanguageEnum) => {
   if (language === LanguageEnum.zhCN) {
     elementPlusLocale.value = zhCN // 设置 Element Plus 组件库语言
     instance!.proxy!.$i18n.locale = 'zh-CN' // 设置 i18n 语言
-  } else if (language === LanguageEnum.zhTW) {
-    elementPlusLocale.value = zhTW
-    instance!.proxy!.$i18n.locale = 'zh-TW'
   } else if (language === LanguageEnum.en) {
     elementPlusLocale.value = en
     instance!.proxy!.$i18n.locale = 'en'

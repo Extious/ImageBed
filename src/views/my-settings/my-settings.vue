@@ -172,6 +172,16 @@
           </li>
         </ul>
       </el-collapse-item>
+
+      <!-- 常用标签设置 -->
+      <el-collapse-item :title="$t('settings.common_tags.title')" name="8">
+        <ul class="setting-list">
+          <li class="setting-item has-desc">
+            <tag-input v-model="userSettings.commonTags" @update:modelValue="persistUserSettings" />
+            <span class="desc">{{ $t('settings.common_tags.desc') }}</span>
+          </li>
+        </ul>
+      </el-collapse-item>
     </el-collapse>
   </div>
 </template>

@@ -5,11 +5,36 @@
   box-sizing border-box
   width 100%
   height 100%
-  padding 0 20rem
-  background var(--background-color)
+  padding 0 24rem
+  background linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end))
+  background-size 200% 200%
+  animation gradientShift 8s ease-in-out infinite
+  color #fff
+  box-shadow 0 8rem 32rem rgba(0,0,0,0.12), 0 2rem 8rem rgba(0,0,0,0.08)
+  backdrop-filter blur(10px)
+  position relative
+  z-index 1000
+  overflow hidden
+  
+  &::before {
+    content ''
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
+    background linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end))
+    opacity 0.9
+    z-index -1
+  }
+  
+  &::after {
+    content none
+  }
 
   .header-left {
     display flex
+    align-items center
     justify-content flex-start
     height 100%
 
@@ -19,23 +44,48 @@
       justify-content flex-start
       height 100%
       cursor pointer
+      transition none
+      position relative
+      padding 8rem 16rem
+      border-radius 12rem
+      backdrop-filter none
 
       .logo {
-        width 46rem
-        height 46rem
-        margin-right 10rem
+        width 48rem
+        height 48rem
+        margin-right 12rem
+        transition all 0.3s ease
+        border-radius 8rem
+        overflow hidden
+        box-shadow 0 4rem 12rem rgba(255,255,255,0.1)
 
         img {
           width 100%
+          height 100%
+          object-fit cover
+          transition transform 0.3s ease
         }
       }
 
-
       .title {
-        font-weight bold
-        font-size 36rem
+        font-weight 700
+        font-size 24rem
+        letter-spacing 1rem
+        color #ffffff
+        background none
+        background-clip initial
+        -webkit-background-clip initial
+        -webkit-text-fill-color #ffffff
+        text-shadow none
+        transition none
+        line-height 1
       }
-    }
+
+      &::before {
+        content none
+      }
+      }
+    
 
 
     .website-count {
@@ -45,6 +95,7 @@
       margin-left 10rem
       padding-bottom 12rem
       font-size 14rem
+      color rgba(255,255,255,0.85)
       cursor pointer
 
       +picx-mobile() {
@@ -64,46 +115,108 @@
       display flex
       align-items center
       cursor pointer
+      padding 6rem 12rem
+      border-radius 24rem
+      background rgba(255,255,255,0.1)
+      backdrop-filter blur(10px)
+      border 1rem solid rgba(255,255,255,0.2)
+      transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+      position relative
+      overflow hidden
+
+      &::before {
+        content ''
+        position absolute
+        top 0
+        left -100%
+        width 100%
+        height 100%
+        background linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)
+        transition left 0.6s ease
+      }
+
+      &:hover {
+        background rgba(255,255,255,0.2)
+        transform translateY(-1rem)
+        box-shadow 0 8rem 24rem rgba(0,0,0,0.15)
+        
+        &::before {
+          left 100%
+        }
+
+        .avatar {
+          transform scale(1.1)
+          border-color rgba(255,255,255,0.8)
+          box-shadow 0 4rem 12rem rgba(255,255,255,0.3)
+        }
+
+        .username {
+          transform translateX(-2rem)
+        }
+
+        .caret-bottom-icon {
+          transform rotate(180deg)
+        }
+      }
 
       .username {
         font-size 16rem
+        color rgba(255,255,255,0.95)
+        font-weight 500
+        transition all 0.3s ease
+        margin-right 8rem
       }
 
       .avatar-box {
         display flex
         align-items center
         justify-content space-between
-        margin-left 12rem
 
         .avatar {
           display flex
           align-items center
           justify-content center
           box-sizing border-box
-          width 38rem
-          height 38rem
-          padding 1rem
-          color var(--text-color)
-          border 1rem solid var(--text-color)
+          width 40rem
+          height 40rem
+          padding 2rem
+          color #fff
+          border 2rem solid rgba(255,255,255,0.4)
           border-radius 50%
+          background rgba(255,255,255,0.1)
+          transition all 0.3s ease
+          margin-right 8rem
 
           img {
             width 100%
             height 100%
             border-radius 50%
+            object-fit cover
           }
         }
 
-
         .user-filled-icon {
           font-size 20rem
+          margin-right 8rem
         }
 
         .caret-bottom-icon {
-          margin-left 5rem
-          font-size 20rem
+          font-size 18rem
+          color rgba(255,255,255,0.8)
+          transition transform 0.3s ease
         }
       }
     }
   }
 }
+
+// 动画定义
+@keyframes gradientShift {
+  0%, 100% {
+    background-position 0% 50%
+  }
+  50% {
+    background-position 100% 50%
+  }
+}
+

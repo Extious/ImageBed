@@ -10,10 +10,9 @@ export default function configPWAPlugin() {
     registerType: 'autoUpdate',
     injectRegister: 'auto',
     manifest: {
-      name: 'PicX',
-      short_name: 'PicX',
-      description:
-        'PicX 是一款基于 GitHub API 开发的图床工具，提供图片上传托管、生成图片链接和常用图片工具箱服务。',
+      name: 'Extious Image Hosting',
+      short_name: 'Extious',
+      description: 'Extious 的图床',
       icons: [
         {
           src: './logo@192x192.png',

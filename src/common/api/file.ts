@@ -17,7 +17,8 @@ export const getFileInfo = (userConfigInfo: UserConfigInfoModel, path: string) =
         params: {
           ref,
           t: Date.now()
-        }
+        },
+        noShowErrorMsg: true
       })
 
       // request 已返回响应 data，本处直接返回 res

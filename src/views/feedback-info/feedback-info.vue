@@ -1,40 +1,43 @@
 <template>
   <div class="page-container feedback-page-container">
-    <div class="help-info-item description">🏞️ {{ $t('feedback.text_1') }}</div>
+    <el-card class="section">
+      <div class="section-title">{{ $t('feedback.section_overview') }}</div>
+      <p class="description">{{ $t('feedback.desc') }}</p>
+      <p class="bookmark">
+        {{ $t('feedback.bookmark') }} {{ $t('shortcut_key') }}: <code>{{ shortcutKey }}</code>
+      </p>
+    </el-card>
 
-    <div class="help-info-item">
-      🌍 {{ $t('feedback.text_2') }} {{ $t('shortcut_key') }}：<code>{{ shortcutKey }}</code>
-    </div>
+    <el-card class="section">
+      <div class="section-title">{{ $t('feedback.section_quickstart') }}</div>
+      <ol class="list">
+        <li>{{ $t('feedback.quick_1') }}</li>
+        <li>{{ $t('feedback.quick_2') }}</li>
+        <li>{{ $t('feedback.quick_3') }}</li>
+        <li>{{ $t('feedback.quick_4') }}</li>
+      </ol>
+    </el-card>
 
-    <div class="help-info-item">
-      🦁 {{ $t('author') }}：
-      <el-link type="primary" href="https://xpoet.cn/" target="_blank">@XPoet</el-link>
-    </div>
+    <el-card class="section">
+      <div class="section-title">{{ $t('feedback.section_features') }}</div>
+      <ul class="list">
+        <li>{{ $t('feedback.feature_1') }}</li>
+        <li>{{ $t('feedback.feature_2') }}</li>
+        <li>{{ $t('feedback.feature_3') }}</li>
+        <li>{{ $t('feedback.feature_4') }}</li>
+        <li>{{ $t('feedback.feature_5') }}</li>
+        <li>{{ $t('feedback.feature_6') }}</li>
+      </ul>
+    </el-card>
 
-    <div class="help-info-item">
-      🌀 {{ $t('repo') }}：
-      <el-link type="primary" href="https://github.com/XPoet/picx" target="_blank">
-        https://github.com/XPoet/picx
-      </el-link>
-    </div>
+    
 
-    <div class="help-info-item">
-      📖 {{ $t('document') }}：
-      <el-link type="primary" href="https://picx-docs.xpoet.cn" target="_blank">
-        https://picx-docs.xpoet.cn
-      </el-link>
-    </div>
-
-    <div class="help-info-item" style="margin-bottom: 2rem">🎁 {{ $t('feedback.text_3') }}</div>
-
-    <div class="help-info-item img">
-      <el-image style="width: 300rem" src="https://xpoet.cn/images/admire-code-wechat.webp" />
-    </div>
-
-    <div class="help-info-item red-text">
-      <strong> ⚠️ {{ $t('feedback.text_4') }} </strong>
-    </div>
+    <el-card class="section">
+      <div class="section-title">{{ $t('feedback.section_disclaimer') }}</div>
+      <div class="red-text"><strong>{{ $t('feedback.disclaimer') }}</strong></div>
+    </el-card>
   </div>
+  
 </template>
 
 <script setup lang="ts">

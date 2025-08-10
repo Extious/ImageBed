@@ -28,10 +28,23 @@
   &::-webkit-scrollbar-thumb {
     background var(--scrollbar-color)
     border-radius $box-border-radius
+    border 2rem solid transparent
+    background-clip content-box
+    transition background 0.3s ease
+    
+    &:hover {
+      background var(--text-color-4)
+      background-clip content-box
+    }
   }
 
   &::-webkit-scrollbar-track {
-    background transparent
+    background var(--scroll-bar-bg-color)
+    border-radius $box-border-radius
+  }
+
+  &::-webkit-scrollbar-corner {
+    background var(--scroll-bar-bg-color)
   }
 }
 
@@ -85,10 +98,22 @@ li {
   box-sizing border-box
   width 100%
   height 100%
-  padding 30rem
+  padding 32rem
   overflow-y auto
   background var(--background-color)
   border-top-left-radius $box-border-radius
+  
+  &::before {
+    content ''
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
+    background linear-gradient(135deg, var(--background-color) 0%, var(--background-color-2) 100%)
+    z-index -1
+    border-top-left-radius $box-border-radius
+  }
 
   .page-content {
     position relative
@@ -98,6 +123,7 @@ li {
     max-width 1200rem
     height 100%
     transform translateX(-50%)
+    animation fadeInUpCenter 0.6s cubic-bezier(0.4, 0, 0.2, 1)
   }
 }
 
@@ -249,6 +275,103 @@ li {
 .border-box {
   position relative
   box-sizing border-box
+}
+
+// 现代化动画
+@keyframes fadeInUp {
+  from {
+    opacity 0
+    transform translateY(30rem)
+  }
+  to {
+    opacity 1
+    transform translateY(0)
+  }
+}
+
+@keyframes fadeInUpCenter {
+  from {
+    opacity 0
+    transform translateY(30rem) translateX(-50%)
+  }
+  to {
+    opacity 1
+    transform translateY(0) translateX(-50%)
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity 0
+  }
+  to {
+    opacity 1
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity 0
+    transform translateX(-30rem)
+  }
+  to {
+    opacity 1
+    transform translateX(0)
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow 0 0 10rem rgba(102,126,234,0.3)
+  }
+  50% {
+    box-shadow 0 0 20rem rgba(102,126,234,0.6)
+  }
+}
+
+// 工具类
+.glass-effect {
+  background var(--glass-bg)
+  backdrop-filter blur(20px)
+  border 1rem solid var(--glass-border)
+}
+
+.modern-card {
+  background var(--background-color)
+  border-radius 16rem
+  box-shadow var(--card-shadow)
+  border 1rem solid var(--border-color-light)
+  transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+  
+  &:hover {
+    box-shadow var(--card-shadow-hover)
+    transform translateY(-4rem)
+  }
+}
+
+.shimmer {
+  position relative
+  overflow hidden
+  
+  &::after {
+    content ''
+    position absolute
+    top 0
+    left -100%
+    width 100%
+    height 100%
+    background linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)
+    animation shimmer 2s infinite
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left -100%
+  }
+  100% {
+    left 100%
+  }
 }
 
 

@@ -1,4 +1,4 @@
-.upload-image-card-container {
+.upload-image-card-container
   position relative
   display flex
   flex-direction column
@@ -7,53 +7,97 @@
   width 100%
   margin-bottom 20rem
   overflow hidden
-  border 1rem solid var(--border-color)
-  border-radius 6rem
+  border 1rem solid var(--border-color-light)
+  border-radius 16rem
+  background linear-gradient(135deg, var(--background-color), var(--background-color-2))
+  box-shadow var(--card-shadow)
+  backdrop-filter blur(10px)
+  transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+  animation fadeInUp 0.5s ease-out
+  
+  &::before
+    content ''
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
+    background linear-gradient(135deg, var(--accent-color)01, transparent)
+    border-radius inherit
+    opacity 0
+    transition opacity 0.3s ease
+    z-index 0
 
-  &.wait-upload {
+  &.wait-upload
     border-color var(--await-upload-color)
-  }
-
-  &.uploading {
+    box-shadow 0 0 20rem rgba(230,162,60,0.2)
+    
+  &.uploading
     border-color var(--uploading-color)
-  }
-
-  &.uploaded {
+    box-shadow 0 0 20rem rgba(64,158,255,0.2)
+    animation pulseGlow 2s infinite
+    
+  &.uploaded
     border-color var(--uploaded-color)
-  }
+    box-shadow 0 0 20rem rgba(103,194,58,0.2)
 
-  &:last-child {
+  &:last-child
     margin-bottom 0
-  }
 
+  &:hover
+    transform translateY(-4rem) scale(1.02)
+    box-shadow var(--card-shadow-hover)
+    border-color var(--accent-color)30
+    
+    &::before
+      opacity 1
+      
+    .del-img-btn
+      display flex
+      opacity 1
+      transform scale(1)
 
-  &:hover {
-    .del-img-btn {
-      display block
-    }
-  }
-
-
-  .img-show-container {
+  .img-show-container
     position relative
     box-sizing border-box
     width 100%
-    height 140rem
+    height 180rem
+    overflow hidden
+    border-radius 16rem 16rem 0 0
+    z-index 1
 
-    .el-image {
+    .el-image
       width 100%
       height 100%
-    }
-  }
+      transition transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)
+      object-fit cover
 
+    &::after
+      content ''
+      position absolute
+      top 0
+      left 0
+      width 100%
+      height 100%
+      background linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.1) 100%)
+      opacity 0
+      transition opacity 0.3s ease
+      z-index 2
 
-  .before-upload-handle-container {
+    &:hover
+      .el-image
+        transform scale(1.1)
+        
+      &::after
+        opacity 1
+
+  .before-upload-handle-container
     position relative
     box-sizing border-box
     width 100%
     border-top 1rem solid var(--border-color)
 
-    .img-name-box {
+    .img-name-box
       position relative
       display flex
       align-items center
@@ -63,18 +107,17 @@
       padding 2rem 5rem
       font-size 13rem
       border-bottom 1rem solid var(--border-color)
+      background var(--background-color)
 
-      &.no-border {
+      &.no-border
         border-bottom none
-      }
 
-      .img-name {
+      .img-name
         position relative
         box-sizing border-box
         width calc(100% - 20rem)
-      }
 
-      .fold-btn {
+      .fold-btn
         position relative
         display flex
         align-items center
@@ -83,10 +126,12 @@
         width 20rem
         font-size 15rem
         cursor pointer
-      }
-    }
+        color var(--text-color-3)
+        transition color .2s ease
+        &:hover
+          color var(--el-color-primary)
 
-    .img-name-operate-box {
+    .img-name-operate-box
       position relative
       display flex
       flex-direction column
@@ -95,92 +140,108 @@
       padding 2rem 5rem
       border-bottom 1rem solid var(--border-color)
 
-      &.folded {
+      &.folded
         display none
-      }
 
-
-      .operate-item {
+      .operate-item
         display flex
         align-items center
         height 28rem
 
-        .rename-input {
+        .rename-input
           margin-left 10rem
-        }
-      }
-    }
 
-    .img-info-box {
+    .img-info-box
       display flex
       align-items center
       justify-content space-between
       padding 5rem
       font-size 12rem
       user-select none
+      background var(--background-color)
 
-      .file-size-box {
+      .file-size-box
         transform scale(0.9)
 
-        .file-size-item {
+        .file-size-item
           padding 2rem 3rem
           background var(--background-color-3)
           border-radius 3rem
-        }
 
-
-        .original-file-size {
+        .original-file-size
           margin-left -4rem
-
-          &.del-line {
+          &.del-line
             text-decoration line-through
-          }
-        }
 
-
-        .finial-file-size {
+        .finial-file-size
           margin-left 6rem
           color var(--el-color-primary)
-        }
-      }
-    }
 
-    .img-tags-box {
+    .img-tags-box
       padding 8rem
       border-top 1rem solid var(--border-color)
-    }
-  }
 
-
-  .after-upload-handle-container {
+  .after-upload-handle-container
     position relative
     box-sizing border-box
     width 100%
-    height 30rem
+    height 34rem
     color var(--el-color-primary)
     font-size 13rem
     background var(--el-color-primary-light-9)
     border-top 1rem solid var(--border-color)
     cursor pointer
 
-    &:hover {
+    &:hover
       color var(--el-color-white)
       background var(--el-color-primary)
-    }
-  }
 
-
-  .del-img-btn {
+  .del-img-btn
     position absolute
-    top 6rem
-    right 6rem
-    display none
-    color var(--background-color)
-    font-size 22rem
+    top 12rem
+    right 12rem
+    display flex
+    align-items center
+    justify-content center
+    width 36rem
+    height 36rem
+    color white
+    font-size 18rem
+    background rgba(239,68,68,0.9)
+    border-radius 50%
     cursor pointer
-  }
+    backdrop-filter blur(10px)
+    box-shadow 0 4rem 12rem rgba(239,68,68,0.3)
+    transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+    opacity 0
+    transform scale(0.8)
+    z-index 10
+    
+    &::before
+      content ''
+      position absolute
+      top 0
+      left 0
+      width 100%
+      height 100%
+      background radial-gradient(circle, var(--danger-color) 0%, transparent 70%)
+      border-radius 50%
+      opacity 0
+      transition opacity 0.3s ease
+      z-index -1
 
-  .upload-status-box {
+    &:hover
+      background var(--danger-color)
+      transform scale(1.1)
+      box-shadow 0 8rem 24rem rgba(239,68,68,0.4)
+      
+      &::before
+        opacity 0.5
+
+    &:active
+      transform scale(0.95)
+
+  .upload-status-box
     position absolute
     top -8rem
     left -16rem
@@ -192,22 +253,15 @@
     box-shadow 0 1rem 1rem var(--border-color)
     transform rotate(315deg)
 
-    &.wait-upload {
+    &.wait-upload
       background var(--await-upload-color)
-    }
 
-    &.uploaded {
+    &.uploaded
       background var(--uploaded-color)
-
-      .el-icon {
+      .el-icon
         margin-top 12rem
-      }
-    }
 
-    .el-icon {
+    .el-icon
       margin-top 10rem
       font-size 12rem
       transform rotate(45deg)
-    }
-  }
-}

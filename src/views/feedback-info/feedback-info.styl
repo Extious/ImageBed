@@ -1,34 +1,35 @@
-.feedback-page-container {
+.feedback-page-container
 
-  .help-info-item {
-    display flex
-    align-items center
-    margin-bottom 10rem
-    padding 6rem
-    font-size 16rem
-
-    code {
+  .section
+    margin-bottom 12rem
+    .section-title
+      font-size 18rem
+      font-weight 600
+      margin-bottom 8rem
+    .description
+      line-height 28rem
+    .bookmark
+      margin-top 6rem
+    .list
+      margin 0
+      padding-left 18rem
+      li
+        line-height 26rem
+        margin 4rem 0
+    .links
+      padding-left 0
+      li
+        list-style none
+        margin 6rem 0
+    code
       box-sizing border-box
       padding 3rem 6rem
       font-weight bold
       background var(--background-color-2)
       border-radius 6rem
       box-shadow 2rem 2rem 5rem var(--shadow-color)
-    }
-
-    &:last-child {
-      margin-bottom 0
-    }
-  }
-
-  .description {
-    font-weight bold
-    line-height 28rem
-  }
-
-  .red-text {
+  
+  .red-text
     margin-top 6rem
     color var(--el-color-danger)
-    font-size 22rem
-  }
-}
+    font-size 16rem

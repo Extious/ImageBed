@@ -2,7 +2,8 @@ import {
   ImageLinkFormatModel,
   UploadedImageModel,
   UserConfigInfoModel,
-  UserSettingsModel
+  UserSettingsModel,
+  ImageLinkTypeEnum
 } from '@/common/model'
 import { copyText } from '@/utils'
 import i18n from '@/plugins/vue/i18n'
@@ -18,8 +19,16 @@ export const generateImageLinks = (
   userConfigInfo: UserConfigInfoModel,
   userSettings: UserSettingsModel
 ): string | null => {
-  const { selected } = userSettings.imageLinkType
-  const { rule } = userSettings.imageLinkType.presetList[selected]
+  const { selected, presetList } = userSettings.imageLinkType
+  let rule = presetList[selected]?.rule
+
+  // fallback if rule is invalid or contains unwanted domain
+  const isSuspicious = typeof rule === 'string' && /weiyan\.(cc|tech)/i.test(rule)
+  if (!rule || isSuspicious) {
+    rule = presetList[ImageLinkTypeEnum.GitHubPages]?.rule
+      || 'https://{{owner}}.github.io/{{repo}}/{{path}}'
+  }
+
   if (rule) {
     const { owner, selectedRepo: repo, selectedBranch: branch } = userConfigInfo
     return rule

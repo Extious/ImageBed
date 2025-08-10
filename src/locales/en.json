@@ -29,7 +29,7 @@
     "management": "Image Hosting Management",
     "settings": "My Settings",
     "toolbox": "Toolbox",
-    "feedback": "Feedback",
+    "feedback": "About",
     "actions": "Quick actions"
   },
   "actions": {
@@ -120,8 +120,16 @@
       "tip_2": "It is detected that your cloud repository has a configuration file. Do you want to use it?",
       "tip_3": "It is detected that your settings data has changed. Do you want to synchronize it to the cloud repository?",
       "tip_4": "The local settings data is consistent with the cloud repository settings data",
-      "success_msg_1": "Save successfully",
-      "success_msg_2": "Update successful"
+      "success_msg_1": "Saved",
+      "success_msg_2": "Updated",
+      "pull": "Pull from cloud",
+      "save_btn": "Save to cloud",
+      "update_btn": "Update cloud",
+      "equal_btn": "Synced"
+    },
+    "common_tags": {
+      "title": "Common Tags",
+      "desc": "Set commonly used tags for quick selection when uploading images"
     }
   },
   "config": {
@@ -219,7 +227,8 @@
     "selectTotal": "Selected {total} images",
     "contextmenu_1": "Upload new image from current location",
     "contextmenu_2": "Upload image to < {dir} >",
-    "contextmenu_3": "Root directory"
+    "contextmenu_3": "Root directory",
+    "noData": "No data"
   },
   "toolbox": {
     "tool_1": "Image Compressor",
@@ -236,10 +245,24 @@
     "add_watermark": "Add Watermark"
   },
   "feedback": {
-    "text_1": "PicX is a GitHub API based image hosting tool, providing image upload and hosting, generating image links, and a set of commonly used image tools.",
-    "text_2": "We suggest adding our website to your browser bookmarks for easy future access.",
-    "text_3": "If PicX is helpful to you, please consider donating to the author to support open source development.",
-    "text_4": "Disclaimer: Do not upload images that violate the laws in your local jurisdiction. The author is not responsible for any consequences arising from such actions."
+    "section_overview": "Overview",
+    "section_quickstart": "Quick Start",
+    "section_features": "Features",
+    "section_links": "Links",
+    "section_disclaimer": "Disclaimer",
+    "desc": "Extious Image Hosting, modified and optimized based on the PicX project. It supports image upload and hosting, link generation, and includes common image tools.",
+    "bookmark": "We recommend adding this site to your browser bookmarks for quicker access next time.",
+    "quick_1": "Complete configuration: after login, select repository, branch and directory.",
+    "quick_2": "Upload images: drag and drop, paste, or click the area to select files.",
+    "quick_3": "Copy link: after upload succeeds, copy the image link with one click.",
+    "quick_4": "Personalize: configure naming, compression, watermark and link rules in My Settings.",
+    "feature_1": "Upload and host: content is hosted on your GitHub repository.",
+    "feature_2": "Compression: multiple encoders to balance size and compatibility.",
+    "feature_3": "Watermark: customizable text, color, position and opacity.",
+    "feature_4": "Link rules: custom generation rules and multi-format conversion.",
+    "feature_5": "Tags: add and filter image tags.",
+    "feature_6": "One-click deploy: support deploying to GitHub Pages.",
+    "disclaimer": "Do not upload images that violate laws in your jurisdiction. You are solely responsible for your use."
   },
   "region": {
     "CN": "Mainland China",
@@ -253,7 +276,6 @@
   },
   "language": {
     "zh-CN": "Simplified Chinese",
-    "zh-TW": "Traditional Chinese",
     "en": "English"
   },
   "toggle_language_msg": "We detected that your IP is located in {region}. Do you want to switch to {language}?",
@@ -279,7 +301,7 @@
   },
   "tags": {
     "editTags": "Edit tags",
-    "addTag": "Add tag",
+    "addTag": "添加标签",
     "suggestions": "Suggestions",
     "filter": "Tag filter",
     "clearFilter": "Clear filter",

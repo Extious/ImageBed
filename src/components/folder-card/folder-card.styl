@@ -3,27 +3,82 @@
   display flex
   flex-direction column
   align-items center
-  justify-content flex-start
+  justify-content center
   box-sizing border-box
-  width 100rem
-  height 100rem
-  padding 3rem
+  width 100%
+  height 150rem
+  padding 16rem
   user-select none
+  background var(--background-color)
+  border 1rem solid var(--border-color)
+  border-radius 12rem
+  box-shadow var(--card-shadow)
+  cursor pointer
+  transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+
+  &::before {
+    content ''
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
+    background linear-gradient(135deg, var(--el-color-primary-light-9) 0%, transparent 100%)
+    opacity 0
+    transition opacity 0.3s ease
+    border-radius inherit
+    pointer-events none
+  }
 
   &:hover {
-    background var(--background-color-2)
+    background var(--background-color)
+    border-color var(--el-color-primary-light-3)
+    transform translateY(-6rem) scale(1.02)
+    box-shadow 0 12rem 24rem rgba(0, 0, 0, 0.12), 0 8rem 16rem rgba(0, 0, 0, 0.08)
+
+    &::before {
+      opacity 1
+    }
+
+    .icon {
+      transform scale(1.15) rotate(5deg)
+      
+      svg {
+        filter drop-shadow(0 4rem 8rem rgba(0, 0, 0, 0.1))
+        
+        path {
+          fill var(--el-color-primary)
+        }
+      }
+    }
+
+    .text {
+      color var(--el-color-primary)
+      font-weight 600
+    }
+  }
+
+  &:active {
+    transform translateY(-3rem) scale(1.01)
+    transition-duration 0.1s
   }
 
   .icon {
     display flex
     align-items center
     justify-content center
-    width 50rem
-    height 50rem
+    width 60rem
+    height 60rem
+    margin-bottom 8rem
+    transition transform 0.3s ease
 
     svg {
       width 100%
       height 100%
+      
+      path {
+        transition fill 0.3s ease
+      }
     }
   }
 
@@ -31,14 +86,46 @@
   .text {
     display -webkit-box
     width 90%
-    margin-top 5rem
     overflow hidden
     font-size 14rem
+    font-weight 500
     text-align center
     text-overflow ellipsis
     word-wrap break-word
     word-break break-all
+    color var(--text-color)
     -webkit-box-orient vertical
     -webkit-line-clamp 2
+    transition color 0.3s ease
+  }
+
+  // 响应式设计
+  +picx-tablet() {
+    height 130rem
+    padding 12rem
+
+    .icon {
+      width 50rem
+      height 50rem
+    }
+
+    .text {
+      font-size 13rem
+    }
+  }
+
+  +picx-mobile() {
+    height 120rem
+    padding 10rem
+
+    .icon {
+      width 45rem
+      height 45rem
+      margin-bottom 6rem
+    }
+
+    .text {
+      font-size 12rem
+    }
   }
 }

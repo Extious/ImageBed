@@ -34,8 +34,6 @@ export enum LanguageEnum {
   // eslint-disable-next-line no-unused-vars
   zhCN = 'zh-CN',
   // eslint-disable-next-line no-unused-vars
-  zhTW = 'zh-TW',
-  // eslint-disable-next-line no-unused-vars
   en = 'en'
 }
 
@@ -83,6 +81,8 @@ export interface UserSettingsModel {
     textColor: string
     opacity: number
   }
+  // Commonly used tags for quick selection during upload
+  commonTags: string[]
   deploy: {
     [key: string]: DeployStatusInfo
   }

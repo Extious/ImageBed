@@ -17,7 +17,7 @@
         v-model="inputValue"
         class="tag-input"
         size="small"
-        @keyup.enter="handleInputConfirm"
+        @keydown.enter.stop.prevent="handleInputConfirm"
         @blur="handleInputConfirm"
       />
       <el-button
@@ -26,11 +26,11 @@
         size="small"
         @click="showInput"
       >
-        + {{ $t('tags.addTag') || '添加标签' }}
+        + 添加标签
       </el-button>
     </div>
-    <div class="tag-suggestions" v-if="suggestedTags.length > 0">
-      <span class="suggestion-label">{{ $t('tags.suggestions') || '常用标签' }}:</span>
+    <div class="tag-suggestions" v-if="suggestedTags.length">
+      <span class="suggestion-label">Suggestions:</span>
       <el-tag
         v-for="tag in suggestedTags"
         :key="tag"
@@ -47,7 +47,7 @@
 <script lang="ts" setup>
 import { ref, computed, nextTick, watch } from 'vue'
 import { ElInput } from 'element-plus'
-import { useStore } from '@/stores'
+import { store } from '@/stores'
 
 const props = defineProps<{
   modelValue: string[]
@@ -58,29 +58,41 @@ const emit = defineEmits<{
   'update:modelValue': [value: string[]]
 }>()
 
-const store = useStore()
 const InputRef = ref<InstanceType<typeof ElInput>>()
 
-const tags = computed({
-  get: () => props.modelValue || [],
-  set: (value) => emit('update:modelValue', value)
-})
+// 本地可编辑状态，确保在服务式弹窗环境下也能即时更新 UI
+const tags = ref<string[]>([...(props.modelValue || [])])
+watch(
+  () => props.modelValue,
+  (val) => {
+    tags.value = [...(val || [])]
+  },
+  { deep: true }
+)
 
 const inputVisible = ref(false)
 const inputValue = ref('')
 
-// 获取所有已使用的标签作为建议
+// 获取建议标签：优先展示常用标签，其次展示历史已使用标签
+const userSettings = computed(() => (store?.getters as any)?.getUserSettings ?? null)
 const suggestedTags = computed(() => {
-  const allTags = store.getters.getAllTags || []
-  return allTags
-    .filter((tag: string) => !tags.value.includes(tag))
-    .slice(0, 10) // 最多显示10个建议
+  const allTags: string[] = ((store?.getters as any)?.getAllTags as string[] | undefined) ?? []
+  const common: string[] = (userSettings.value?.commonTags as string[] | undefined) ?? []
+
+  // 先放常用标签（排除已选），再补充历史标签（去重且排除已选）
+  const priority = common.filter((t) => !tags.value.includes(t))
+  const others = allTags.filter(
+    (t: string) => !tags.value.includes(t) && !priority.includes(t)
+  )
+
+  return [...priority, ...others].slice(0, 20)
 })
 
 const handleClose = (index: number) => {
   const newTags = [...tags.value]
   newTags.splice(index, 1)
   tags.value = newTags
+  emit('update:modelValue', newTags)
 }
 
 const showInput = () => {
@@ -95,18 +107,24 @@ const handleInputConfirm = () => {
     const trimmedValue = inputValue.value.trim()
     if (trimmedValue && !tags.value.includes(trimmedValue)) {
       if (!props.maxTags || tags.value.length < props.maxTags) {
-        tags.value = [...tags.value, trimmedValue]
+        const newTags = [...tags.value, trimmedValue]
+        tags.value = newTags
+        emit('update:modelValue', newTags)
       }
     }
   }
-  inputVisible.value = false
-  inputValue.value = ''
+  nextTick(() => {
+    inputVisible.value = false
+    inputValue.value = ''
+  })
 }
 
 const addSuggestedTag = (tag: string) => {
   if (!tags.value.includes(tag)) {
     if (!props.maxTags || tags.value.length < props.maxTags) {
-      tags.value = [...tags.value, tag]
+      const newTags = [...tags.value, tag]
+      tags.value = newTags
+      emit('update:modelValue', newTags)
     }
   }
 }

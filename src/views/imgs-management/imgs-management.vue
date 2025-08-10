@@ -48,13 +48,11 @@
           }"
           v-contextmenu="{ type: ContextmenuEnum.parentDir }"
         >
-          <li class="image-management-item" v-if="userConfigInfo.viewDir !== '/'">
-            <folder-card mode="back" />
-          </li>
+          
           <li
             class="image-management-item"
             v-for="(dir, index) in currentPathDirList"
-            :key="'folder-card-' + dir.dir + '-' + index"
+            :key="'folder-card-' + dir.dir"
             v-contextmenu="{ type: ContextmenuEnum.childDir, dir: dir.dir }"
           >
             <folder-card :folder-obj="dir" />
@@ -63,7 +61,7 @@
           <li
             class="image-management-item image"
             v-for="(image, index) in filteredImageList"
-            :key="'image-card-' + index"
+            :key="'image-card-' + image.path"
             v-contextmenu="{ type: ContextmenuEnum.img, img: image }"
           >
             <image-card :image-obj="image" />
@@ -103,6 +101,8 @@ const loadError = ref<string>('')
 const currentPathDirList = ref([])
 const currentPathImageList = ref([])
 const selectedTags = ref<string[]>([]) // 选中的标签
+const enableAutoTagsReconcile = ref(false)
+const skipFirstReconcile = ref(true)
 
 const isShowBatchTools = ref(false)
 
@@ -136,7 +136,7 @@ async function dirContentHandle(dir: string) {
     if (!ok) {
       loadError.value = 'No content or not deployed'
     }
-    // 拉取最新标签，保证新增标签可见
+    // 拉取最新标签，保证与目录同步
     await refreshTagsFromGitHub(userConfigInfo)
   } catch (e: any) {
     loadError.value = e?.message || 'Load failed'
@@ -177,11 +177,16 @@ async function reloadCurrentDirContent() {
   await store.dispatch('DIR_IMAGE_LIST_INIT_DIR', viewDir)
   loadingImageList.value = true
   await getRepoPathContent(userConfigInfo, viewDir)
+  // 强制从 GitHub 拉取最新标签数据
+  await refreshTagsFromGitHub(userConfigInfo)
   loadingImageList.value = false
 }
 
 onMounted(async () => {
   await initializeTagsData(userConfigInfo)
+  // 首次进入页面强制从 GitHub 拉取标签与目录
+  await refreshTagsFromGitHub(userConfigInfo)
+  await getRepoPathContent(userConfigInfo, userConfigInfo.viewDir || '/')
   initDirImageList()
 })
 
@@ -212,12 +217,15 @@ watch(
       currentPathDirList.value = filterDirContent(viewDir, dirContent, 'dir')
       currentPathImageList.value = filterDirContent(viewDir, dirContent, 'image')
       store.commit('REPLACE_IMAGE_CARD', { checkedImgArr: currentPathImageList.value })
-      // 防抖对齐当前目录标签数据，剔除已删图片的标签
-      if (reconcileTimer) clearTimeout(reconcileTimer)
-      reconcileTimer = setTimeout(() => {
-        const validPaths = currentPathImageList.value.map((img: UploadedImageModel) => img.path)
-        reconcileTagsForDir(userConfigInfo, viewDir, validPaths)
-      }, 300)
+      // 可选：自动对齐标签（默认关闭，且跳过首次进入页面以避免并发提交造成 409）
+      if (enableAutoTagsReconcile.value && !skipFirstReconcile.value) {
+        if (reconcileTimer) clearTimeout(reconcileTimer)
+        reconcileTimer = setTimeout(() => {
+          const validPaths = currentPathImageList.value.map((img: UploadedImageModel) => img.path)
+          reconcileTagsForDir(userConfigInfo, viewDir, validPaths)
+        }, 300)
+      }
+      if (skipFirstReconcile.value) skipFirstReconcile.value = false
     }
   },
   { deep: true }

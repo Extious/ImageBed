@@ -2,13 +2,7 @@
   <header class="header">
     <div class="header-left">
       <div class="brand" @click="router.push('/')">
-        <div class="logo">
-          <img src="../../assets/logo.png" alt="PicX" />
-        </div>
-        <div class="title">PicX</div>
-      </div>
-      <div class="website-count">
-        <site-count :isuv="false" />
+        <div class="title">Extious的图床</div>
       </div>
     </div>
 
@@ -50,7 +44,6 @@
                 @change="persistUserSettings"
               >
                 <el-option label="中文简体" :value="LanguageEnum.zhCN"></el-option>
-                <el-option label="中文繁體" :value="LanguageEnum.zhTW"></el-option>
                 <el-option label="English" :value="LanguageEnum.en"></el-option>
               </el-select>
             </li>

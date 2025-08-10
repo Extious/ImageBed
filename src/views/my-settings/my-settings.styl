@@ -1,39 +1,143 @@
 :deep(.el-collapse-item__header) {
   font-size 16rem
+  font-weight 600
+  color var(--text-color-2)
+  transition all 0.3s ease
+  
+  &:hover {
+    color var(--accent-color)
+  }
 }
 
+:deep(.el-collapse-item__content) {
+  animation fadeInUp 0.4s ease-out
+}
 
 .setting-title {
   margin 40rem 0 25rem 0
-  font-weight bold
-  font-size 16rem
+  font-weight 700
+  font-size 18rem
+  color var(--text-color-2)
+  position relative
+  padding-left 16rem
+  
+  &::before {
+    content ''
+    position absolute
+    left 0
+    top 50%
+    transform translateY(-50%)
+    width 4rem
+    height 20rem
+    background linear-gradient(180deg, var(--accent-color), var(--accent-color-light))
+    border-radius 2rem
+  }
+  
+  &::after {
+    content ''
+    position absolute
+    left 0
+    bottom -8rem
+    width 60rem
+    height 2rem
+    background linear-gradient(90deg, var(--accent-color)40, transparent)
+    border-radius 1rem
+  }
 
   &:first-child {
     margin-top 0
   }
 }
 
+.settings-page-container {
+  animation fadeIn 0.6s ease-out
+  
+  .el-collapse {
+    background transparent
+    border-radius 16rem
+    overflow hidden
+    box-shadow var(--card-shadow-light)
+    
+    :deep(.el-collapse-item) {
+      background var(--background-color)
+      border 1rem solid var(--border-color-light)
+      border-radius 12rem
+      margin-bottom 16rem
+      overflow hidden
+      transition all 0.3s ease
+      
+      &:hover {
+        box-shadow var(--card-shadow)
+        transform translateY(-2rem)
+      }
+      
+      .el-collapse-item__header {
+        background linear-gradient(135deg, var(--background-color), var(--background-color-2))
+        border-bottom 1rem solid var(--border-color-light)
+        padding 16rem 20rem
+      }
+      
+      .el-collapse-item__content {
+        padding 20rem
+      }
+    }
+  }
+}
 
 .setting-list {
   margin 0
   padding 0
 
   .setting-item {
-    margin-bottom 10rem
+    margin-bottom 16rem
+    padding 16rem 20rem
+    background linear-gradient(135deg, var(--background-color), var(--background-color-2))
+    border 1rem solid var(--border-color-light)
+    border-radius 12rem
+    box-shadow var(--card-shadow)
+    transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+    position relative
+    overflow hidden
+    
+    &::before {
+      content ''
+      position absolute
+      top 0
+      left 0
+      right 0
+      bottom 0
+      background linear-gradient(135deg, var(--accent-color)02, transparent)
+      opacity 0
+      pointer-events none
+      transition opacity 0.3s ease
+    }
 
     &:last-child {
       margin-bottom 0
+    }
+    
+    &:hover {
+      box-shadow var(--card-shadow-hover)
+      transform translateY(-2rem)
+      border-color var(--accent-color)20
+      
+      &::before {
+        opacity 1
+      }
     }
 
     &.has-desc {
       display flex
       align-items center
-      color var(--text-color-4)
-      font-size 12rem
+      color var(--text-color-3)
+      font-size 13rem
+      font-weight 500
       user-select none
 
       .desc {
-        margin-left 10rem
+        margin-left 12rem
+        color var(--text-color-4)
+        font-weight 400
 
         +picx-mobile() {
           display none
@@ -41,21 +145,40 @@
       }
     }
 
-
     &.cdn {
       display flex
       align-items center
     }
 
-
     .prefix-input {
       width calc(100% - 56rem)
       margin-left 56rem
+      
+      :deep(.el-input__wrapper) {
+        border-radius 8rem
+        box-shadow var(--card-shadow-light)
+        transition all 0.3s ease
+        
+        &:hover {
+          box-shadow var(--card-shadow)
+        }
+        
+        &.is-focus {
+          box-shadow 0 0 0 2rem var(--ring-color)
+        }
+      }
     }
 
-
-    :deep() .el-switch {
+    :deep(.el-switch) {
       user-select none
+      
+      .el-switch__core {
+        transition all 0.3s ease
+        
+        &:hover {
+          box-shadow 0 0 8rem var(--ring-color)
+        }
+      }
     }
   }
 }

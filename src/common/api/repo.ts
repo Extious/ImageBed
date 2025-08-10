@@ -88,11 +88,15 @@ If you like it, please give it a star on [GitHub](https://github.com/XPoet/picx)
   const res = await request({
     url: `/repos/${owner}/${repo}/contents/README.md`,
     method: 'PUT',
-    data: {
-      message: PICX_INIT_REPO_MSG,
-      branch,
-      content: window.btoa(README)
-    },
+      data: {
+        message: PICX_INIT_REPO_MSG,
+        branch,
+        content: (() => {
+          const utf8 = new TextEncoder().encode(README)
+          const binary = Array.from(utf8, b => String.fromCharCode(b)).join('')
+          return btoa(binary)
+        })()
+      },
     noShowErrorMsg: true
   })
 

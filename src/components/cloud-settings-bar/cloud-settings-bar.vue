@@ -1,16 +1,43 @@
 <template>
-  <div class="cloud-settings-data-box border-box">
-    <div>{{ actionsTip }}</div>
-    <el-button
-      type="primary"
-      text
-      :icon="icon.IEpCheck"
-      :loading="saveLoading"
-      :disabled="saveDisabled"
-      @click="onOK"
-    >
-      {{ $t('confirm') }}
-    </el-button>
+  <div class="cloud-settings-data-box border-box" :class="stateClass">
+    <div class="tips">{{ actionsTip }}</div>
+    <div class="actions">
+      <template v-if="!hasCloud">
+        <el-button
+          type="primary"
+          text
+          class="action-btn"
+          :icon="icon.IEpCheck"
+          :loading="saveLoading"
+          @click="saveToCloud"
+        >
+          {{ $t('settings.cloud_settings.save_btn') }}
+        </el-button>
+      </template>
+      <template v-else>
+        <el-button
+          type="primary"
+          text
+          class="action-btn"
+          :icon="icon.IEpCheck"
+          :disabled="isEqual"
+          @click="useCloudSettings"
+        >
+          {{ $t('settings.cloud_settings.pull') }}
+        </el-button>
+        <el-button
+          text
+          class="action-btn"
+          :icon="icon.IEpCheck"
+          :loading="saveLoading"
+          :disabled="isEqual"
+          @click="saveToCloud"
+        >
+          {{ $t('settings.cloud_settings.update_btn') }}
+        </el-button>
+        <el-tag v-if="isEqual" class="status-tag" type="success">{{ $t('settings.cloud_settings.equal_btn') }}</el-tag>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -53,6 +80,13 @@ const actionsTip = computed(() => {
   }
 })
 
+const hasCloud = computed(() => !!cloudSettings.value)
+const isEqual = computed(() => hasCloud.value && deepObjectEqual(userSettings, cloudSettings.value))
+const stateClass = computed(() => {
+  if (!hasCloud.value) return 'is-empty'
+  return isEqual.value ? 'is-synced' : 'is-different'
+})
+
 // 保存（更新）到云端
 const saveToCloud = async () => {
   saveLoading.value = true
@@ -77,23 +111,18 @@ const useCloudSettings = () => {
 // 初始化云端设置数据
 const initCloudSettings = async () => {
   const res = await getCloudSettings(userConfigInfo)
-  cloudSettings.value = res ? JSON.parse(window.atob(res.content)) : null
+  cloudSettings.value = res
+    ? (() => {
+        const bin = atob(res.content)
+        const bytes = Uint8Array.from(bin, c => c.charCodeAt(0))
+        const text = new TextDecoder().decode(bytes)
+        return JSON.parse(text)
+      })()
+    : null
 }
 
-// 确定操作
-const onOK = () => {
-  // eslint-disable-next-line default-case
-  switch (selectedAction.value) {
-    case CloudSettingsActions.save:
-    case CloudSettingsActions.update:
-      saveToCloud()
-      break
-
-    case CloudSettingsActions.use:
-      useCloudSettings()
-      break
-  }
-}
+// 保留 onOK 以兼容旧行为（不在模板中使用）
+const onOK = () => {}
 
 watch(
   () => userSettings,

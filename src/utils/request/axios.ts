@@ -35,10 +35,8 @@ axios.interceptors.response.use(
     return response
   },
   (error) => {
-    if (!error?.response) {
-      ElMessage.error({ duration: 6000, message: `${error}` })
-    }
-    return Promise.reject(error.response)
+    // 保留原始错误对象，交由上层统一处理（包含 error.response / error.message 等）
+    return Promise.reject(error)
   }
 )
 

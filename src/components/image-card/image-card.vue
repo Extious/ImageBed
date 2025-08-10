@@ -9,12 +9,13 @@
   >
     <div class="image-box">
       <el-image
+        :key="imageObj.path + '-' + (imageObj.sha || '')"
         :src="imgUrl"
         fit="cover"
-        loading="lazy"
-        lazy
         :hide-on-click-modal="true"
-        :preview-src-list="[imgUrl]"
+        :preview-src-list="previewList"
+        :preview-teleported="true"
+        :z-index="3000"
       />
     </div>
 
@@ -139,12 +140,11 @@ const isManagementPage = computed(() => {
 const imgUrl = computed(() => {
   const base = generateImageLinks(props.imageObj, userConfigInfo, userSettings)
   if (!base) return base
-  if (isManagementPage.value) {
-    const param = `t=${props.imageObj.sha || ''}`
-    return base.includes('?') ? `${base}&${param}` : `${base}?${param}`
-  }
+  // 在管理页避免追加随机时间戳参数，直接依赖 sha 变更触发的 URL 变化
   return base
 })
+
+const previewList = computed(() => [imgUrl.value])
 
 // 获取图片的标签
 const imageTags = computed(() => {
@@ -350,45 +350,49 @@ const viewImageProperties = (imgObj: UploadedImageModel) => {
  * @param imgObj
  */
 const editTags = (imgObj: UploadedImageModel) => {
-  const currentTags = [...imageTags.value]
-  
-  ElMessageBox({
-    title: instance?.proxy?.$t('tags.editTags') || '编辑标签',
-    message: () => h(TagInput, {
-      modelValue: currentTags,
+  const currentTags = ref<string[]>([...imageTags.value])
+
+  const renderContent = () => {
+    const vnode = h(TagInput, {
+      modelValue: currentTags.value,
       'onUpdate:modelValue': (val: string[]) => {
-        currentTags.length = 0
-        currentTags.push(...val)
+        currentTags.value = [...val]
       }
-    }),
+    })
+    if (instance?.appContext) {
+      ;(vnode as any).appContext = instance.appContext
+    }
+    return vnode
+  }
+
+  ElMessageBox({
+    title: 'Edit tags',
+    message: renderContent,
     showCancelButton: true,
-    confirmButtonText: instance?.proxy?.$t('confirm') || '确定',
-    cancelButtonText: instance?.proxy?.$t('cancel') || '取消',
-    beforeClose: async (action, messageBoxInstance, done) => {
+    confirmButtonText: 'Confirm',
+    cancelButtonText: 'Cancel',
+    distinguishCancelAndClose: true,
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    beforeClose: async (action, _instance, done) => {
       if (action === 'confirm') {
         const loading = ElLoading.service({
           lock: true,
-          text: instance?.proxy?.$t('loading') || '保存中...'
+          text: 'Saving'
         })
-        
-        const success = await updateImageTags(userConfigInfo, imgObj.path, currentTags)
+        const success = await updateImageTags(userConfigInfo, imgObj.path, currentTags.value)
         loading.close()
-        
         if (success) {
-          ElMessage.success({
-            message: instance?.proxy?.$t('tags.updateSuccess') || '标签更新成功'
-          })
+          ElMessage.success({ message: 'Tags updated' })
           done()
         } else {
-          ElMessage.error({
-            message: instance?.proxy?.$t('tags.updateFailed') || '标签更新失败'
-          })
+          ElMessage.error({ message: 'Update failed' })
         }
       } else {
         done()
       }
     }
-  })
+  }).catch(() => {})
 }
 </script>
 

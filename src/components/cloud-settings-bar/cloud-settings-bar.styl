@@ -6,4 +6,42 @@
   color var(--text-color-2)
   border 1rem solid var(--text-color-4)
   border-radius 6rem
+  background var(--background-color)
+
+  &.is-empty {
+    border-color var(--el-color-warning-light-5)
+    background var(--el-color-warning-light-9)
+  }
+
+  &.is-different {
+    border-color var(--el-color-primary-light-5)
+    background var(--el-color-primary-light-9)
+  }
+
+  &.is-synced {
+    border-color var(--el-color-success-light-5)
+    background var(--el-color-success-light-9)
+  }
+
+  .tips {
+    font-size 14rem
+    display flex
+    align-items center
+    gap 8rem
+  }
+
+  .actions {
+    display flex
+    align-items center
+    gap 12rem
+  }
+
+  .action-btn {
+    padding 4rem 10rem
+    border-radius 6rem
+  }
+
+  .status-tag {
+    border-radius 6rem
+  }
 }

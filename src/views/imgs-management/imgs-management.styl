@@ -1,4 +1,7 @@
 $infoBarHeight = 50rem
+$card-padding-x = 16rem
+$card-padding-y = 12rem
+$card-gap = 20rem
 
 .management-page-container {
   padding-bottom 0 !important
@@ -6,9 +9,14 @@ $infoBarHeight = 50rem
   .content-container {
     position relative
     box-sizing border-box
+    display flex
+    flex-direction column
     width 100%
     height 100%
     padding-top $infoBarHeight
+    padding-left 20rem
+    padding-right 20rem
+    overflow-x hidden
 
     .top {
       position relative
@@ -17,52 +25,322 @@ $infoBarHeight = 50rem
       align-items center
       justify-content space-between
       width 100%
-      height 30rem
-      padding-bottom 10rem
+      min-height 52rem
+      padding $card-padding-y $card-padding-x
+      margin-bottom $card-gap
+      background linear-gradient(135deg, var(--background-color), var(--background-color-2))
+      border 1rem solid var(--border-color-light)
+      border-radius 16rem
+      box-shadow var(--card-shadow)
+      backdrop-filter blur(10px)
+      transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+      animation slideInFromLeft 0.6s ease-out
+
+      &::before {
+        content ''
+        position absolute
+        top 0
+        left 0
+        right 0
+        bottom 0
+        background linear-gradient(135deg, var(--accent-color)03, transparent)
+        border-radius inherit
+        opacity 0
+        transition opacity 0.3s ease
+      }
+
+      &:hover {
+        box-shadow var(--card-shadow-hover)
+        transform translateY(-2rem)
+        border-color var(--accent-color-light)20
+        
+        &::before {
+          opacity 1
+        }
+      }
 
       .btn-icon {
-        font-size 22rem
+        font-size 24rem
         cursor pointer
+        color var(--text-color-3)
+        transition all .4s cubic-bezier(0.4, 0, 0.2, 1)
+        padding 8rem
+        border-radius 8rem
+        position relative
+        overflow hidden
+
+        &::before {
+          content ''
+          position absolute
+          top 50%
+          left 50%
+          transform translate(-50%, -50%)
+          width 0
+          height 0
+          background var(--el-color-primary-light-8)
+          border-radius 50%
+          transition all 0.5s ease
+          opacity 0
+        }
+
+        &::after {
+          content ''
+          position absolute
+          top 50%
+          left 50%
+          transform translate(-50%, -50%) rotate(0deg)
+          width 100%
+          height 100%
+          background radial-gradient(circle, transparent 30%, var(--el-color-primary-light-9) 70%)
+          opacity 0
+          transition all 0.4s ease
+          border-radius inherit
+        }
+
+        &:hover { 
+          color var(--el-color-primary)
+          background transparent
+          transform rotate(-90deg) scale(1.1)
+          
+          &::before {
+            width 150%
+            height 150%
+            opacity 1
+          }
+
+          &::after {
+            opacity 1
+            transform translate(-50%, -50%) rotate(180deg)
+          }
+        }
+
+        &:active {
+          transform rotate(-90deg) scale(0.95)
+          transition-duration 0.1s
+        }
       }
     }
 
     .tag-filter-wrapper {
-      margin-bottom 10rem
+      margin-bottom $card-gap
+      padding $card-padding-y $card-padding-x
+      background linear-gradient(135deg, var(--background-color), var(--background-color-2))
+      border 1rem solid var(--border-color-light)
+      border-radius 16rem
+      box-shadow var(--card-shadow)
+      backdrop-filter blur(10px)
+      transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+      overflow hidden
+      box-sizing border-box
+      animation fadeInUp 0.7s ease-out
+      animation-delay 0.1s
+      animation-fill-mode both
+      
+      &::before {
+        content ''
+        position absolute
+        top 0
+        left 0
+        right 0
+        bottom 0
+        background linear-gradient(135deg, var(--accent-color)02, transparent)
+        border-radius inherit
+        opacity 0
+        transition opacity 0.3s ease
+      }
+
+      &:hover {
+        box-shadow var(--card-shadow-hover)
+        transform translateY(-2rem)
+        
+        &::before {
+          opacity 1
+        }
+      }
     }
 
     .bottom {
       position relative
       box-sizing border-box
       width 100%
-      height 100%
-      border 1rem solid var(--border-color)
-      border-bottom none
-      border-top-left-radius 6rem
-      border-top-right-radius 6rem
-
+      flex 1
+      min-height 0
+      border 1rem solid var(--border-color-light)
+      border-radius 16rem
+      background var(--background-color)
+      box-shadow var(--card-shadow)
+      backdrop-filter blur(10px)
+      overflow hidden
+      transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+      animation fadeInUp 0.8s ease-out
+      animation-delay 0.2s
+      animation-fill-mode both
+      
+      &::before {
+        content ''
+        position absolute
+        top 0
+        left 0
+        right 0
+        bottom 0
+        background linear-gradient(135deg, var(--background-color), var(--background-color-3))
+        border-radius inherit
+        opacity 0.5
+        z-index 0
+      }
 
       .image-management-list {
         position relative
-        display flex
-        flex-wrap wrap
-        align-content flex-start
+        display grid
+        grid-template-columns repeat(auto-fill, minmax(280rem, 1fr))
+        grid-auto-rows max-content
+        justify-items stretch
+        align-items start
         box-sizing border-box
         width 100%
-        padding 2rem
+        padding $card-gap
         overflow-y auto
+        gap $card-gap
+        scroll-behavior smooth
+        z-index 1
+
+        // 强制换行分隔符（用于将目录与图片分隔到新行）
+        > div {
+          grid-column 1 / -1
+        }
+        
+        // 增强的网格动画
+        &::before {
+          content ''
+          position absolute
+          top 0
+          left 0
+          width 100%
+          height 100%
+          background url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23667eea' fill-opacity='0.01'%3E%3Cpath d='M0 0h40v40H0z'/%3E%3C/g%3E%3C/svg%3E")
+          pointer-events none
+          z-index -1
+        }
+
+        &::-webkit-scrollbar {
+          width 12rem
+        }
+
+        &::-webkit-scrollbar-track {
+          background var(--background-color-2)
+          border-radius 12rem
+          border 2rem solid transparent
+          background-clip content-box
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background linear-gradient(180deg, var(--accent-color), var(--accent-color-light))
+          border-radius 12rem
+          border 2rem solid transparent
+          background-clip content-box
+          transition all 0.3s ease
+          box-shadow 0 2rem 8rem rgba(102,126,234,0.2)
+
+          &:hover {
+            background linear-gradient(180deg, var(--accent-color-light), var(--accent-color))
+            box-shadow 0 4rem 12rem rgba(102,126,234,0.3)
+          }
+        }
+        
+        &::-webkit-scrollbar-corner {
+          background transparent
+        }
 
         li.image-management-item {
           position relative
           box-sizing border-box
-          padding 10rem
+          animation imageItemFadeInUp 0.5s ease forwards
+          opacity 0
+          min-width 0
+        }
 
-          &.image {
-            width 230rem
+        @keyframes imageItemFadeInUp {
+          from {
+            opacity 0
+            transform translateY(20rem)
           }
+          to {
+            opacity 1
+            transform translateY(0)
+          }
+        }
 
-          &:last-child {
-            margin-right 0
-          }
+        // 手动设置动画延迟（可选：如需恢复，使用 stylus 缩进语法编写 nth-child）
+      }
+    }
+  }
+
+  // 响应式设计
+  +picx-tablet-2() {
+    .content-container {
+      padding-left 16rem
+      padding-right 16rem
+
+      .bottom {
+        .image-management-list {
+          grid-template-columns repeat(auto-fill, minmax(240rem, 1fr))
+          gap 16rem
+          padding 16rem
+        }
+      }
+    }
+  }
+
+  +picx-tablet() {
+    .content-container {
+      padding-left 12rem
+      padding-right 12rem
+
+      .top {
+        min-height 40rem
+        padding 10rem 12rem
+      }
+
+      .tag-filter-wrapper {
+        padding 10rem 12rem
+      }
+
+      .bottom {
+        .image-management-list {
+          grid-template-columns repeat(auto-fill, minmax(200rem, 1fr))
+          gap 12rem
+          padding 12rem
+        }
+      }
+    }
+  }
+
+  +picx-mobile() {
+    .content-container {
+      padding-left 8rem
+      padding-right 8rem
+
+      .top {
+        min-height 36rem
+        padding 8rem 10rem
+        margin-bottom 12rem
+
+        .btn-icon {
+          font-size 20rem
+          padding 6rem
+        }
+      }
+
+      .tag-filter-wrapper {
+        padding 8rem 10rem
+        margin-bottom 12rem
+      }
+
+      .bottom {
+        .image-management-list {
+          grid-template-columns repeat(auto-fill, minmax(160rem, 1fr))
+          gap 8rem
+          padding 8rem
         }
       }
     }

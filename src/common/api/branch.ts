@@ -13,7 +13,9 @@ import i18n from '@/plugins/vue/i18n'
 export const getBranchInfo = (owner: string, repo: string, branch: string) => {
   return request({
     url: `/repos/${owner}/${repo}/branches/${branch}`,
-    method: 'GET'
+    method: 'GET',
+    params: { t: Date.now() },
+    noShowErrorMsg: true
   })
 }
 

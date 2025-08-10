@@ -34,7 +34,7 @@ const initSettings: UserSettingsModel = {
   },
   elementPlusSize: ElementPlusSizeEnum.default,
   imageLinkType: {
-    selected: ImageLinkTypeEnum.KGWYTech,
+    selected: ImageLinkTypeEnum.GitHubPages,
     presetList: {
       // GitHubPages
       [`${ImageLinkTypeEnum.GitHubPages}`]: {
@@ -65,18 +65,6 @@ const initSettings: UserSettingsModel = {
         id: getUuid(),
         name: ImageLinkTypeEnum.ChinaJsDelivr,
         rule: 'https://jsd.cdn.zzko.cn/gh/{{owner}}/{{repo}}@{{branch}}/{{path}}'
-      },
-      // KGWYCC
-      [`${ImageLinkTypeEnum.KGWYCC}`]: {
-	id: getUuid(),
-	name: ImageLinkTypeEnum.KGWYCC,
-	rule: 'https://kg.weiyan.cc/{{path}}'
-      },
-      // KGWYTech
-      [`${ImageLinkTypeEnum.KGWYTech}`]: {
-	id: getUuid(),
-	name: ImageLinkTypeEnum.KGWYTech,
-	rule: 'https://kg.weiyan.tech/{{path}}'
       }
     }  
   },
@@ -101,12 +89,14 @@ const initSettings: UserSettingsModel = {
   starred: false,
   watermark: {
     enable: false,
-    text: 'PicX',
+    text: 'Extious',
     fontSize: 50,
     position: WatermarkPositionEnum.rightBottom,
     textColor: '#FFFFFF',
     opacity: 0.5
   },
+  // Commonly used tags
+  commonTags: [],
   deploy: {
     github: {
       uuid: getUuid(),
@@ -118,12 +108,50 @@ const initSettings: UserSettingsModel = {
   language: LanguageEnum.zhCN
 }
 
+const sanitizeUserSettings = (
+  settings: UserSettingsModel,
+  defaults: UserSettingsModel
+) => {
+  const allowedKeys = Object.keys(defaults.imageLinkType.presetList)
+  const preset = settings.imageLinkType.presetList
+
+  // remove unknown rules
+  for (const key in preset) {
+    if (!allowedKeys.includes(key)) {
+      delete preset[key]
+    }
+  }
+
+  // ensure all default rules exist and reset suspicious domains
+  allowedKeys.forEach((key) => {
+    const rule = preset[key]?.rule
+    const containsSuspicious = typeof rule === 'string' && /weiyan\.(cc|tech)/i.test(rule)
+    if (!preset[key] || containsSuspicious) {
+      preset[key] = { ...defaults.imageLinkType.presetList[key] }
+    }
+  })
+
+  // fix selected
+  if (!allowedKeys.includes(settings.imageLinkType.selected)) {
+    settings.imageLinkType.selected = defaults.imageLinkType.selected
+  }
+
+  // normalize language after removing zh-TW support
+  const validLanguages = [LanguageEnum.zhCN, LanguageEnum.en]
+  if (!validLanguages.includes(settings.language)) {
+    settings.language = defaults.language
+  }
+}
+
 const initUserSettings = (): UserSettingsModel => {
+  // clone defaults to avoid mutation by deepAssignObject
+  const settings: UserSettingsModel = JSON.parse(JSON.stringify(initSettings))
   const LSSettings = getLocal(LS_PICX_SETTINGS)
   if (LSSettings) {
-    deepAssignObject(initSettings, LSSettings)
+    deepAssignObject(settings, LSSettings)
   }
-  return initSettings
+  sanitizeUserSettings(settings, initSettings)
+  return settings
 }
 
 const userSettingsModule: Module<UserSettingsStateTypes, RootStateTypes> = {

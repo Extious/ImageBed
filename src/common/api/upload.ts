@@ -6,12 +6,18 @@ import { UploadImageModel } from '@/common/model'
  * @param url
  * @param data
  */
-export const uploadSingleImage = (url: string, data: any) => {
+export const uploadSingleImage = (
+  url: string,
+  data: any,
+  options?: { noShowErrorMsg?: boolean; success422?: boolean }
+) => {
   return request({
     url,
     method: 'PUT',
-    data
-  }).then(res => res?.data || res)
+    data,
+    noShowErrorMsg: options?.noShowErrorMsg,
+    success422: options?.success422
+  }).then((res) => res?.data || res)
 }
 
 /**

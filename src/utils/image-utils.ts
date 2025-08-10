@@ -8,6 +8,7 @@ import { getUuid } from '@/utils/common-utils'
 import { store } from '@/stores'
 import { removeImageTags } from '@/utils/tags-utils'
 import { createCommit, createRef, createTree, deleteSingleImage, getBranchInfo } from '@/common/api'
+import { getRepoPathContent } from '@/common/api'
 import request from '@/utils/request'
 
 /**
@@ -89,14 +90,17 @@ export async function deleteImageFromGitHub(
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve) => {
     const res = await deleteSingleImage(owner, repo, path, sha)
-    imageObj.deleting = false
     if (res) {
+      // 等待 GitHub 后端完成一致性更新，确保后续刷新不会短暂“复活”
+      await waitUntilPathsGone(userConfigInfo, [path])
+      imageObj.deleting = false
       resolve(true)
       // 删除对应的标签数据
       await removeImageTags(userConfigInfo, imageObj.path)
       await store.dispatch('UPLOAD_IMG_LIST_REMOVE', imageObj.uuid)
       await store.dispatch('DIR_IMAGE_LIST_REMOVE', imageObj)
     } else {
+      imageObj.deleting = false
       resolve(false)
     }
   })
@@ -149,7 +153,7 @@ export async function deleteImagesFromGitHub(
     throw new Error('创建 commit 失败')
   }
 
-  // 将当前分支 ref 指向新创建的 commit
+  // 将当前分支 ref 指向新创建的 commit（force 确保 head 立即前移）
   // @ts-ignore
   const refRes = await createRef(owner, repo, branch, commitRes.sha)
   if (!refRes) {
@@ -157,15 +161,58 @@ export async function deleteImagesFromGitHub(
     throw new Error('更新 ref 失败')
   }
 
-  imgObjs.forEach((imgObj) => {
-    imgObj.deleting = false
-    // 删除对应的标签数据
-    // 串行或并行都可，内部 saveTagsToGitHub 自带队列，此处无需额外队列
-    // 这里使用 then 以避免 forEach 中 await 带来的额外复杂性
-    removeImageTags(userConfigInfo, imgObj.path)
-    store.dispatch('UPLOAD_IMG_LIST_REMOVE', imgObj.uuid)
-    store.dispatch('DIR_IMAGE_LIST_REMOVE', imgObj)
-  })
+  // 等待一致性：确认所有路径在 GitHub 上不可见
+  await waitUntilPathsGone(userConfigInfo, imgObjs.map((x) => x.path))
+
+  await Promise.all(
+    imgObjs.map(async (imgObj) => {
+      imgObj.deleting = false
+      // 删除对应的标签数据并同步更新本地状态
+      await removeImageTags(userConfigInfo, imgObj.path)
+      await store.dispatch('UPLOAD_IMG_LIST_REMOVE', imgObj.uuid)
+      await store.dispatch('DIR_IMAGE_LIST_REMOVE', imgObj)
+    })
+  )
+
+  // 删除完成后主动刷新当前目录，确保 UI 与远端一致
+  await getRepoPathContent(userConfigInfo, userConfigInfo.selectedDir || '/')
+}
+
+/**
+ * 轮询等待：直到指定路径在远端不可见（404）或超时
+ */
+async function waitUntilPathsGone(
+  userConfigInfo: UserConfigInfoModel,
+  paths: string[],
+  maxWaitMs: number = 6000
+): Promise<boolean> {
+  const deadline = Date.now() + maxWaitMs
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+  let attempt = 0
+  while (Date.now() < deadline) {
+    try {
+      const { owner, selectedRepo, selectedBranch } = userConfigInfo as any
+      const head: any = await getBranchInfo(owner, selectedRepo, selectedBranch)
+      const treeSha = head?.commit?.commit?.tree?.sha
+      if (!treeSha) break
+      const treeRes: any = await request({
+        url: `/repos/${owner}/${selectedRepo}/git/trees/${treeSha}`,
+        method: 'GET',
+        params: { recursive: 1, t: Date.now() },
+        noShowErrorMsg: true
+      })
+      const treePaths = new Set((treeRes?.tree || []).map((n: any) => n?.path))
+      const normalized = paths.map((p) => (p === '/' ? '' : p.replace(/^\//, '')))
+      const exists = normalized.some((p) => treePaths.has(p))
+      if (!exists) return true
+    } catch (_) {
+      // ignore
+    }
+    attempt += 1
+    const backoff = Math.min(200 * Math.pow(1.6, attempt), 800)
+    await sleep(backoff)
+  }
+  return false
 }
 
 /**

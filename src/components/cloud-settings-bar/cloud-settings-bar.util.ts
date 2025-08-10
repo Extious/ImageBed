@@ -29,7 +29,13 @@ export const saveCloudSettings = async (
 
   const data: any = {
     message: res ? PICX_UPDATE_SETTINGS_MSG : PICX_INIT_SETTINGS_MSG,
-    content: window.btoa(JSON.stringify(userSettings))
+    // Encode JSON to base64 with UTF-8 safety
+    content: (() => {
+      const json = JSON.stringify(userSettings)
+      const utf8 = new TextEncoder().encode(json)
+      const binary = Array.from(utf8, b => String.fromCharCode(b)).join('')
+      return btoa(binary)
+    })()
   }
 
   if (res) {

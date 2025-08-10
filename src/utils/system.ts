@@ -49,7 +49,7 @@ export const getLanguageByRegion = (region: string): LanguageEnum => {
     return LanguageEnum.zhCN
   }
   if (region === 'HK' || region === 'TW' || region === 'MO') {
-    return LanguageEnum.zhTW
+    return LanguageEnum.zhCN
   }
   return LanguageEnum.en
 }

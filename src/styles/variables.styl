@@ -52,53 +52,69 @@ $z-index-9 = 1009
 // ========================================================================================
 // light mode color
 // ========================================================================================
-$background-color = #fff
-$background-color-2 = darken($background-color, 5%)
-$background-color-3 = darken($background-color, 10%)
+$background-color = #fafbfc
+$background-color-2 = #f5f7fa
+$background-color-3 = #ebeef5
 
-$text-color = #50505c
-$text-color-2 = darken($text-color, 10%)
-$text-color-3 = darken($text-color, 5%)
-$text-color-4 = lighten($text-color, 30%)
-$text-color-5 = lighten($text-color, 90%)
+$text-color = #2c3e50
+$text-color-2 = #34495e
+$text-color-3 = #606266
+$text-color-4 = #909399
+$text-color-5 = #c0c4cc
 
-$border-color = darken($background-color, 20%)
+$border-color = #e4e7ed
+$border-color-light = #f0f2f5
 
-$shadow-color = rgba(0, 0, 0, 0.25)
-$shadow-hover-color = rgba(0, 0, 0, 0.45)
+$shadow-color = rgba(0, 0, 0, 0.08)
+$shadow-hover-color = rgba(0, 0, 0, 0.15)
 
-$scrollbar-color = darken($background-color, 20%)
-$scroll-bar-bg-color = darken($background-color, 30%)
+$scrollbar-color = #d3d4d6
+$scroll-bar-bg-color = #f5f7fa
 
 $await-upload-color = #e6a23c
-$uploading-color = #409eff
+$uploading-color = #409eff  
 $uploaded-color = #67c23a
+
+// 新增现代化色彩
+$accent-color = #667eea
+$accent-color-light = #764ba2
+$success-color = #10b981
+$warning-color = #f59e0b
+$danger-color = #ef4444
 
 
 // ========================================================================================
 // dark mode color
 // ========================================================================================
-$dark-background-color = #2a2a2f
-$dark-background-color-2 = darken($dark-background-color, 10%)
-$dark-background-color-3 = darken($dark-background-color, 15%)
+$dark-background-color = #1a1b23
+$dark-background-color-2 = #252730
+$dark-background-color-3 = #2d303b
 
-$dark-text-color = #bebec6
-$dark-text-color-2 = lighten($dark-text-color, 30%)
-$dark-text-color-3 = lighten($dark-text-color, 20%)
-$dark-text-color-4 = darken($dark-text-color, 20%)
-$dark-text-color-5 = darken($dark-text-color, 80%)
+$dark-text-color = #e2e8f0
+$dark-text-color-2 = #f1f5f9
+$dark-text-color-3 = #cbd5e1
+$dark-text-color-4 = #94a3b8
+$dark-text-color-5 = #64748b
 
-$dark-border-color = lighten($dark-background-color, 20%)
+$dark-border-color = #374151
+$dark-border-color-light = #334155
 
-$dark-shadow-color = rgba(128, 128, 128, 0.25)
-$dark-shadow-hover-color = rgba(128, 128, 128, 0.45)
+$dark-shadow-color = rgba(0, 0, 0, 0.3)
+$dark-shadow-hover-color = rgba(0, 0, 0, 0.5)
 
-$dark-scrollbar-color = darken($dark-background-color, 20%)
-$dark-scroll-bar-bg-color = lighten($dark-background-color, 30%)
+$dark-scrollbar-color = #4b5563
+$dark-scroll-bar-bg-color = #374151
 
-$dark-await-upload-color = darken($await-upload-color, 30%)
-$dark-uploading-color = darken($uploading-color, 30%)
-$dark-uploaded-color = darken($uploaded-color, 30%)
+$dark-await-upload-color = #f59e0b
+$dark-uploading-color = #3b82f6
+$dark-uploaded-color = #10b981
+
+// 暗色模式现代化色彩
+$dark-accent-color = #8b5cf6
+$dark-accent-color-light = #a78bfa
+$dark-success-color = #059669
+$dark-warning-color = #d97706
+$dark-danger-color = #dc2626
 
 
 root-color(mode) {
@@ -113,6 +129,7 @@ root-color(mode) {
   --text-color-5 mode == 'light' ? $text-color-5 : $dark-text-color-5
 
   --border-color mode == 'light' ? $border-color : $dark-border-color
+  --border-color-light mode == 'light' ? $border-color-light : $dark-border-color-light
   --shadow-color mode == 'light' ? $shadow-color : $dark-shadow-color
   --shadow-hover-color mode == 'light' ? $shadow-hover-color : $dark-shadow-hover-color
   --scrollbar-color mode == 'light' ? $scrollbar-color : $dark-scrollbar-color
@@ -121,6 +138,27 @@ root-color(mode) {
   --await-upload-color  mode == 'light' ? $await-upload-color : $dark-await-upload-color
   --uploading-color  mode == 'light' ? $uploading-color : $dark-uploading-color
   --uploaded-color  mode == 'light' ? $uploaded-color : $dark-uploaded-color
+
+  // accent colors
+  --accent-color mode == 'light' ? $accent-color : $dark-accent-color
+  --accent-color-light mode == 'light' ? $accent-color-light : $dark-accent-color-light
+  --success-color mode == 'light' ? $success-color : $dark-success-color
+  --warning-color mode == 'light' ? $warning-color : $dark-warning-color
+  --danger-color mode == 'light' ? $danger-color : $dark-danger-color
+
+  // brand gradient - modern purple/blue theme
+  --brand-gradient-start mode == 'light' ? #667eea : #8b5cf6
+  --brand-gradient-end mode == 'light' ? #764ba2 : #a78bfa
+
+  // surface helpers - enhanced shadows
+  --card-shadow mode == 'light' ? 0 4rem 12rem rgba(0,0,0,0.05) : 0 4rem 12rem rgba(0,0,0,0.2)
+  --card-shadow-hover mode == 'light' ? 0 20rem 40rem rgba(0,0,0,0.1) : 0 20rem 40rem rgba(0,0,0,0.3)
+  --card-shadow-light 0 1rem 3rem rgba(0,0,0,0.05)
+  --ring-color mode == 'light' ? rgba(102,126,234,0.3) : rgba(139,92,246,0.4)
+  
+  // glass effect
+  --glass-bg mode == 'light' ? rgba(255,255,255,0.8) : rgba(26,27,35,0.8)
+  --glass-border mode == 'light' ? rgba(255,255,255,0.2) : rgba(255,255,255,0.1)
 }
 
 

@@ -93,10 +93,9 @@ const clearFilter = () => {
 <style lang="stylus" scoped>
 .tag-filter-container
   width: 100%
-  padding: 12rem
-  background-color: var(--el-bg-color)
-  border-radius: 6rem
-  border: 1px solid var(--el-border-color)
+  box-sizing: border-box
+  background-color: transparent
+  border: none
 
   .filter-header
     display: flex
@@ -113,16 +112,40 @@ const clearFilter = () => {
     display: flex
     flex-wrap: wrap
     gap: 8rem
+    max-width: 100%
+    overflow: hidden
 
     .tag-item
       cursor: pointer
-      transition: all 0.3s
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+      max-width: 100%
+      overflow: hidden
+      text-overflow: ellipsis
+      position: relative
+
+      &::before
+        content: ''
+        position: absolute
+        top: 0
+        left: 0
+        right: 0
+        bottom: 0
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%)
+        opacity: 0
+        transition: opacity 0.3s ease
+        border-radius: inherit
+        pointer-events: none
 
       &:hover
-        transform: translateY(-2px)
+        transform: translateY(-3px) scale(1.05)
+        box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3)
+        
+        &::before
+          opacity: 1
 
       .tag-count
         margin-left: 4rem
         font-size: 12rem
         opacity: 0.8
+        white-space: nowrap
 </style>

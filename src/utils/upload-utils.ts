@@ -7,6 +7,7 @@ import {
   uploadSingleImage,
   uploadImageBlob,
   getBranchInfo,
+  getRepoPathContent,
   getFileInfo
 } from '@/common/api'
 import { PICX_UPLOAD_IMG_DESC } from '@/common/constant'
@@ -51,13 +52,14 @@ const uploadedHandle = async (
   // dirImageList 增加目录
   store.dispatch('DIR_IMAGE_LIST_ADD_DIR', dir)
 
-  // dirImageList 增加图片
-  store.dispatch('DIR_IMAGE_LIST_ADD_IMAGE', uploadedImg)
-
-  // 如果有标签，保存到 GitHub
-  if (img.tags && img.tags.length > 0) {
-    await updateImageTags(userConfigInfo, res.path, img.tags)
+  // 有标签先写标签（更新本地 store），再刷新目录，保证标签可见
+  if (uploadedImg.tags && uploadedImg.tags.length > 0) {
+    await updateImageTags(userConfigInfo, res.path, uploadedImg.tags)
   }
+  // 强一致刷新目录
+  await getRepoPathContent(userConfigInfo, dir)
+
+  // 此处逻辑上已在上面处理
 }
 
 /**
@@ -205,20 +207,36 @@ export function uploadImageToGitHub(
       filePath = img.reUploadInfo.path
     }
 
-    const existing = await getFileInfo(userConfigInfo, filePath)
-    if (existing && existing.sha) {
-      data.sha = existing.sha
+    // 直接 PUT；增加重试与 422 容忍，并在失败时尝试读取文件信息作为成功信号
+    const url = uploadUrlHandle(userConfigInfo, img)
+    const maxAttempts = 3
+    let attempt = 0
+    let successPayload: any = null
+    while (attempt < maxAttempts && !successPayload) {
+      const res = await uploadSingleImage(url, data, { noShowErrorMsg: true, success422: true })
+      console.log('uploadSingleImage >> ', res)
+      if (res && (res.content || (res.commit && res.content))) {
+        successPayload = res.content || res
+        break
+      }
+      // 如果 PUT 无响应或失败，尝试读取该文件（可能服务端已写入但客户端感知失败）
+      const info: any = await getFileInfo(userConfigInfo, filePath)
+      if (info && info.sha) {
+        successPayload = { name: info.name, sha: info.sha, path: info.path, size: info.size || 0 }
+        break
+      }
+      attempt += 1
+      if (attempt < maxAttempts) {
+        await new Promise((r) => setTimeout(r, 300 * Math.pow(2, attempt - 1)))
+      }
     }
-
-    const uploadRes = await uploadSingleImage(uploadUrlHandle(userConfigInfo, img), data)
-    console.log('uploadSingleImage >> ', uploadRes)
     img.uploadStatus.uploading = false
-    if (uploadRes) {
-      const { name, sha, path, size } = uploadRes.content
+    if (successPayload) {
+      const { name, sha, path, size } = successPayload
       await uploadedHandle({ name, sha, path, size }, img, userConfigInfo)
       resolve(true)
-    } else {
-      resolve(false)
+      return
     }
+    resolve(false)
   })
 }

@@ -2,22 +2,118 @@
   position relative
   box-sizing border-box
   width 100%
-  box-shadow 1rem 2rem 3rem var(--shadow-color)
+  border-radius 12rem
+  background var(--background-color)
+  border 1rem solid var(--border-color)
+  box-shadow var(--card-shadow)
   user-select none
+  cursor pointer
+  transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+  overflow hidden
 
-  &.checked
+  &.checked {
+    border-color var(--el-color-primary)
+    box-shadow 0 0 0 3rem var(--ring-color)
+  }
+
+  &::before {
+    content ''
+    position absolute
+    top -2rem
+    left -2rem
+    right -2rem
+    bottom -2rem
+    background radial-gradient(circle at center, var(--el-color-primary-light-9) 0%, transparent 70%)
+    opacity 0
+    transition opacity 0.4s ease
+    border-radius inherit
+    pointer-events none
+    z-index -1
+  }
+
   &:hover {
-    box-shadow 0 0 10rem var(--shadow-hover-color)
+    transform translateY(-8rem) scale(1.03)
+    box-shadow 0 20rem 40rem rgba(0, 0, 0, 0.15), 0 12rem 24rem rgba(0, 0, 0, 0.1)
+    border-color var(--el-color-primary-light-3)
+
+    &::before {
+      opacity 1
+    }
+
+    .operation-box {
+      opacity 1
+      transform translateY(-2rem)
+      transition-delay 0.1s
+    }
+
+    .info-box {
+      .filename {
+        color var(--el-color-primary)
+      }
+    }
+  }
+
+  &:active {
+    transform translateY(-4rem) scale(1.02)
+    transition-duration 0.1s
   }
 
   .image-box {
     position relative
     width 100%
-    height 150rem
+    height 180rem
+    overflow hidden
+    background linear-gradient(135deg, var(--background-color-2) 0%, var(--background-color-3) 100%)
 
     .el-image {
       width 100%
       height 100%
+      transition transform .3s cubic-bezier(0.4, 0, 0.2, 1)
+      object-fit cover
+    }
+
+    &::after {
+      content ''
+      position absolute
+      top 0
+      left 0
+      width 100%
+      height 100%
+      background linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.2) 100%)
+      opacity 0
+      transition opacity 0.4s ease
+      pointer-events none
+    }
+
+    &::before {
+      content ''
+      position absolute
+      top 50%
+      left 50%
+      transform translate(-50%, -50%)
+      width 60rem
+      height 60rem
+      background radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%)
+      opacity 0
+      transition all 0.4s ease
+      pointer-events none
+      z-index 2
+    }
+
+    &:hover {
+      .el-image {
+        transform scale(1.08)
+      }
+
+      &::after {
+        opacity 1
+      }
+
+      &::before {
+        opacity 1
+        width 120rem
+        height 120rem
+      }
     }
   }
 
@@ -26,8 +122,7 @@
     position relative
     box-sizing border-box
     width 100%
-    margin-top 5rem
-    padding 5rem
+    padding 12rem
 
     .image-info {
       display flex
@@ -42,21 +137,24 @@
         display flex
         align-items center
         justify-content space-between
-        height 22rem
+        height 28rem
+        gap 8rem
 
         .rename-input {
-          width 122rem
+          flex 1
         }
       }
 
 
       .filename {
-        height 18rem
-        margin-bottom 6rem
-        overflow hidden
         font-size 14rem
+        font-weight 500
+        color var(--text-color)
         white-space nowrap
         text-overflow ellipsis
+        overflow hidden
+        margin-bottom 4rem
+        transition color 0.3s ease
       }
     }
 
@@ -64,27 +162,87 @@
       display flex
       flex-wrap wrap
       gap 4rem
-      margin-top 6rem
+      margin-top 8rem
 
       .tag-item {
-        height 20rem
-        line-height 18rem
+        height 22rem
+        line-height 20rem
         font-size 12rem
+        padding 0 8rem
+        background var(--el-color-primary-light-9)
+        color var(--el-color-primary)
+        border none
+        border-radius 4rem
+        transition all 0.25s cubic-bezier(0.4, 0, 0.2, 1)
+        position relative
+        overflow hidden
+
+        &::before {
+          content ''
+          position absolute
+          top 0
+          left -100%
+          width 100%
+          height 100%
+          background linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%)
+          transition left 0.5s ease
+        }
+
+        &:hover {
+          background var(--el-color-primary-light-7)
+          transform translateY(-2rem) scale(1.05)
+          box-shadow 0 2rem 8rem rgba(64, 158, 255, 0.2)
+
+          &::before {
+            left 100%
+          }
+        }
       }
     }
+  }
+
+  .copy-link-box {
+    padding 0 12rem 12rem
+    opacity 0
+    transition opacity 0.3s ease
+  }
+
+  &:hover .copy-link-box {
+    opacity 1
   }
 
 
   .operation-box {
     position absolute
     top 10rem
-    right 8rem
+    right 10rem
     display flex
     justify-content space-between
-    width calc(100% - 16rem)
+    width calc(100% - 20rem)
+    pointer-events none
+    opacity 0
+    transform translateY(0)
+    transition all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
 
     .operation-left {
+      .pick-btn,
       .picked-btn {
+        background rgba(255, 255, 255, 0.9)
+        backdrop-filter blur(10px)
+        color var(--text-color-3)
+        transition all 0.2s ease
+        
+        &:hover {
+          background var(--el-color-primary)
+          color white
+          transform scale(1.1)
+        }
+      }
+
+      .picked-btn {
+        background var(--el-color-primary)
+        color white
+        
         i {
           font-weight bold
         }
@@ -99,17 +257,110 @@
       display flex
       align-items center
       justify-content center
-      width 32rem
-      height 32rem
-      margin-right 8rem
-      font-size 18rem
-      background var(--background-color)
+      width 36rem
+      height 36rem
+      margin-left 8rem
+      font-size 20rem
+      background rgba(255, 255, 255, 0.9)
+      backdrop-filter blur(10px)
+      color var(--text-color-3)
       border-radius 50%
-      box-shadow 0 0 6rem var(--shadow-color)
+      box-shadow 0 2rem 8rem rgba(0, 0, 0, 0.1)
       cursor pointer
+      pointer-events auto
+      transition all 0.2s ease
 
-      &:last-child {
-        margin-right 0
+      &:hover {
+        background var(--el-color-primary)
+        color white
+        transform scale(1.1)
+        box-shadow 0 4rem 12rem rgba(0, 0, 0, 0.15)
+      }
+
+      &:active {
+        transform scale(0.95)
+      }
+
+      &:first-child {
+        margin-left 0
+      }
+    }
+  }
+
+  // 响应式设计
+  +picx-tablet() {
+    .image-box {
+      height 160rem
+    }
+
+    .info-box {
+      padding 10rem
+
+      .image-info {
+        .filename {
+          font-size 13rem
+        }
+      }
+
+      .image-tags {
+        .tag-item {
+          height 20rem
+          line-height 18rem
+          font-size 11rem
+          padding 0 6rem
+        }
+      }
+    }
+
+    .operation-box {
+      .operation-btn {
+        width 32rem
+        height 32rem
+        font-size 18rem
+      }
+    }
+  }
+
+  +picx-mobile() {
+    .image-box {
+      height 140rem
+    }
+
+    .info-box {
+      padding 8rem
+
+      .image-info {
+        .filename {
+          font-size 12rem
+        }
+      }
+
+      .image-tags {
+        gap 3rem
+        margin-top 6rem
+
+        .tag-item {
+          height 18rem
+          line-height 16rem
+          font-size 10rem
+          padding 0 5rem
+        }
+      }
+    }
+
+    .copy-link-box {
+      padding 0 8rem 8rem
+    }
+
+    .operation-box {
+      top 8rem
+      right 8rem
+
+      .operation-btn {
+        width 28rem
+        height 28rem
+        font-size 16rem
+        margin-left 6rem
       }
     }
   }

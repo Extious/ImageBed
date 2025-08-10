@@ -4,6 +4,13 @@ import { getFileInfo, uploadSingleImage } from '@/common/api'
 
 const TAGS_FILE_PATH = '.tags/tags.json'
 
+// 统一路径格式：去掉开头的 '/'
+const normalizePath = (p: string): string => {
+  if (!p) return p
+  if (p === '/') return '/'
+  return p.replace(/^\//, '')
+}
+
 // 串行化标签写入，避免并发写入引发 409 冲突
 let tagsSaveQueue: Promise<boolean> = Promise.resolve(true)
 
@@ -23,9 +30,9 @@ export async function fetchTagsFromGitHub(userConfigInfo: UserConfigInfoModel): 
 
     const fileInfo: any = await getFileInfo(userConfigInfo, TAGS_FILE_PATH)
     if (fileInfo && fileInfo.content) {
-      // 使用 atob 和 TextDecoder 来正确处理 Unicode 字符
+      // Decode base64 to UTF-8 safely
       const binaryString = atob(fileInfo.content)
-      const utf8Bytes = Uint8Array.from(binaryString, char => char.charCodeAt(0))
+      const utf8Bytes = Uint8Array.from(binaryString, (char) => char.charCodeAt(0))
       const content = new TextDecoder().decode(utf8Bytes)
       return JSON.parse(content) as TagsDataModel
     }
@@ -45,6 +52,10 @@ export async function saveTagsToGitHub(
   isUpdate: boolean = false
 ): Promise<boolean> {
   try {
+    // 仅在用户触发的标签变更时才执行写入，初始化等场景直接跳过
+    if (!isUpdate) {
+      return true
+    }
     const { owner, selectedRepo, selectedBranch, token } = userConfigInfo
 
     if (!owner || !selectedRepo || !token || !selectedBranch) {
@@ -53,21 +64,18 @@ export async function saveTagsToGitHub(
     }
 
     // 读取远端，拿最新 sha 并做数据合并，避免丢失并发更新（强制防缓存）
-    const latestInfo = await getFileInfo({ ...userConfigInfo, selectedBranch: `${userConfigInfo.selectedBranch}` }, TAGS_FILE_PATH)
+    const latestInfo: any = await getFileInfo({ ...userConfigInfo, selectedBranch: `${userConfigInfo.selectedBranch}` }, TAGS_FILE_PATH)
     let sha: string | undefined = latestInfo?.sha
     let mergedData: TagsDataModel = tagsData
 
     if (latestInfo && latestInfo.content) {
       try {
         const binaryString = atob(latestInfo.content)
-        const utf8Bytes = Uint8Array.from(binaryString, char => char.charCodeAt(0))
+        const utf8Bytes = Uint8Array.from(binaryString, (char) => char.charCodeAt(0))
         const latestStr = new TextDecoder().decode(utf8Bytes)
         const latestData = JSON.parse(latestStr) as TagsDataModel
-        // 合并：以当前 tagsData 为准覆盖最新远端对应路径，其余保留
-        const images: Record<string, string[]> = { ...(latestData.images || {}) }
-        Object.keys(tagsData.images || {}).forEach((k) => {
-          images[k] = tagsData.images[k]
-        })
+        // 合并策略调整：以本地数据为唯一真源，确保删除本地不存在的键
+        const images: Record<string, string[]> = { ...(tagsData.images || {}) }
         mergedData = {
           version: latestData.version || '1.0.0',
           lastUpdated: new Date().toISOString(),
@@ -87,16 +95,37 @@ export async function saveTagsToGitHub(
       sha = undefined
     }
 
+    // 如果数据没有实质变化，则跳过写入，避免无意义 PUT
+    try {
+      if (latestInfo && latestInfo.content) {
+        const latestBinary = atob(latestInfo.content)
+        const latestBytes = Uint8Array.from(latestBinary, (c) => c.charCodeAt(0))
+        const latestText = new TextDecoder().decode(latestBytes)
+        const latestJson = JSON.parse(latestText) as TagsDataModel
+        const normalize = (d: TagsDataModel) => ({
+          version: d.version || '1.0.0',
+          images: d.images || {}
+        })
+        const a = JSON.stringify(normalize(latestJson))
+        const b = JSON.stringify(normalize(mergedData))
+        if (a === b) {
+          return true
+        }
+      }
+    } catch (_) {
+      // 忽略比较失败，继续走写入逻辑
+    }
+
     const jsonString = JSON.stringify(mergedData, null, 2)
     const utf8Bytes = new TextEncoder().encode(jsonString)
-    const binaryString = Array.from(utf8Bytes, byte => String.fromCharCode(byte)).join('')
+    const binaryString = Array.from(utf8Bytes, (byte) => String.fromCharCode(byte)).join('')
     const content = btoa(binaryString)
 
     const url = `/repos/${owner}/${selectedRepo}/contents/${TAGS_FILE_PATH}`
 
     const buildBody = (shaValue?: string) => {
-      const base: any = {
-        message: `Update PicX tags data - ${new Date().toISOString()}`,
+    const base: any = {
+      message: `Update Extious tags data - ${new Date().toISOString()}`,
         content,
         branch: selectedBranch
       }
@@ -106,7 +135,7 @@ export async function saveTagsToGitHub(
 
     const tryUpload = async (payload: any): Promise<any> => {
       try {
-        return await uploadSingleImage(url, payload)
+        return await uploadSingleImage(url, payload, { noShowErrorMsg: true })
       } catch (error: any) {
         const status = error?.status
         const msg: string = error?.data?.message || ''
@@ -127,7 +156,7 @@ export async function saveTagsToGitHub(
       const payload = buildBody(currentSha)
       result = await tryUpload(payload)
       if (result) break
-      const latest = await getFileInfo(userConfigInfo, TAGS_FILE_PATH)
+      const latest: any = await getFileInfo(userConfigInfo, TAGS_FILE_PATH)
       currentSha = latest?.sha
       const backoff = 200 * Math.pow(2, attempt)
       await new Promise((r) => setTimeout(r, backoff))
@@ -167,15 +196,9 @@ export async function initializeTagsData(userConfigInfo: UserConfigInfoModel): P
           lastUpdated: new Date().toISOString(),
           images: {}
         }
-        // 通过队列保存，避免与上传流程竞争
-        tagsSaveQueue = tagsSaveQueue.then(() => saveTagsToGitHub(userConfigInfo, initialData, false))
-        const ok = await tagsSaveQueue
-        if (ok) {
-          store.commit('SET_TAGS_DATA', initialData)
-        } else {
-          const latest = await fetchTagsFromGitHub(userConfigInfo)
-          if (latest) store.commit('SET_TAGS_DATA', latest)
-        }
+        // 不在初始化阶段创建远端文件，避免打开页面即触发写入导致 409
+        // 仅在用户实际修改标签时再创建/更新远端数据
+        store.commit('SET_TAGS_DATA', initialData)
       }
       tagsInitialized = true
     })()
@@ -195,6 +218,7 @@ export async function updateImageTags(
   tags: string[]
 ): Promise<boolean> {
   try {
+    const path = normalizePath(imagePath)
     let tagsData = store.getters.getTagsData
 
     if (!tagsData) {
@@ -212,7 +236,7 @@ export async function updateImageTags(
     }
 
     // 更新本地数据
-    await store.dispatch('updateImageTags', { path: imagePath, tags })
+    await store.dispatch('updateImageTags', { path, tags })
 
     // 获取更新后的数据
     const updatedData = store.getters.getTagsData
@@ -234,6 +258,7 @@ export async function removeImageTags(
   imagePath: string
 ): Promise<boolean> {
   try {
+    const path = normalizePath(imagePath)
     let tagsData = store.getters.getTagsData
 
     if (!tagsData) {
@@ -250,7 +275,7 @@ export async function removeImageTags(
     }
 
     // 更新本地数据
-    await store.dispatch('removeImageTags', imagePath)
+    await store.dispatch('removeImageTags', path)
 
     // 获取更新后的数据
     const updatedData = store.getters.getTagsData
@@ -269,9 +294,22 @@ export async function removeImageTags(
  */
 export async function refreshTagsFromGitHub(userConfigInfo: UserConfigInfoModel): Promise<void> {
   try {
-    const latest = await fetchTagsFromGitHub(userConfigInfo)
-    if (!latest) return
+    // 强一致：先基于最新 HEAD 读取 contents（getFileInfo 已有时间戳防缓存）
+    const latest = await fetchTagsFromGitHub({ ...userConfigInfo })
     const local = store.getters.getTagsData as TagsDataModel | null
+    // 若远端不存在，则自动创建（用本地数据或最小初始数据）
+    if (!latest) {
+      const dataToCreate: TagsDataModel =
+        local || { version: '1.0.0', lastUpdated: new Date().toISOString(), images: {} }
+      await saveTagsToGitHub(userConfigInfo, dataToCreate, true)
+      const created = await fetchTagsFromGitHub(userConfigInfo)
+      if (created) {
+        store.commit('SET_TAGS_DATA', created)
+      } else {
+        store.commit('SET_TAGS_DATA', dataToCreate)
+      }
+      return
+    }
     if (!local) {
       store.commit('SET_TAGS_DATA', latest)
       return
@@ -343,9 +381,7 @@ export async function reconcileTagsForDir(
       images: imagesMap
     }
     store.commit('SET_TAGS_DATA', newData)
-    // 串行保存，沿用队列以避免并发 409
-    // eslint-disable-next-line no-underscore-dangle
-    // @ts-ignore - reuse existing queue from module scope
+    // 串行保存
     tagsSaveQueue = tagsSaveQueue.then(() => saveTagsToGitHub(userConfigInfo, newData, true))
     // @ts-ignore
     return await tagsSaveQueue

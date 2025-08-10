@@ -36,7 +36,12 @@ export const saveCloudDeployInfo = async () => {
 
   const data: any = {
     message: res ? PICX_UPDATE_DEPLOY_MSG : PICX_INIT_DEPLOY_MSG,
-    content: window.btoa(JSON.stringify(userSettings.deploy))
+    content: (() => {
+      const json = JSON.stringify(userSettings.deploy)
+      const utf8 = new TextEncoder().encode(json)
+      const binary = Array.from(utf8, b => String.fromCharCode(b)).join('')
+      return btoa(binary)
+    })()
   }
 
   if (res) {
@@ -60,7 +65,11 @@ export const saveCloudDeployInfo = async () => {
  * @param content
  */
 export const setCloudDeployInfo = (content: string) => {
+  // Decode base64 to UTF-8 JSON safely
+  const bin = atob(content)
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0))
+  const text = new TextDecoder().decode(bytes)
   store.dispatch('SET_USER_SETTINGS', {
-    deploy: JSON.parse(window.atob(content))
+    deploy: JSON.parse(text)
   })
 }

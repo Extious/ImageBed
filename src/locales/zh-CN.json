@@ -29,7 +29,7 @@
     "management": "图床管理",
     "settings": "我的设置",
     "toolbox": "工具箱",
-    "feedback": "帮助反馈",
+    "feedback": "关于",
     "actions": "快捷操作"
   },
   "actions": {
@@ -121,7 +121,15 @@
       "tip_3": "检测到你的设置数据有变化，是否同步到云端仓库？",
       "tip_4": "本地设置数据和云端仓库设置数据一致",
       "success_msg_1": "保存成功",
-      "success_msg_2": "更新成功"
+      "success_msg_2": "更新成功",
+      "pull": "从云端拉取",
+      "save_btn": "保存到云端",
+      "update_btn": "更新云端",
+      "equal_btn": "已同步"
+    },
+    "common_tags": {
+      "title": "常用标签",
+      "desc": "设置常用标签，在上传图片时可快速选择"
     }
   },
   "config": {
@@ -220,7 +228,8 @@
     "selectTotal": "已选择 {total} 张图片",
     "contextmenu_1": "从当前位置上传新图片",
     "contextmenu_2": "上传图片到 < {dir} >",
-    "contextmenu_3": "根目录"
+    "contextmenu_3": "根目录",
+    "noData": "暂无数据"
   },
   "toolbox": {
     "tool_1": "图片压缩",
@@ -237,10 +246,24 @@
     "add_watermark": "添加水印"
   },
   "feedback": {
-    "text_1": "PicX 是一款基于 GitHub API 开发的图床工具，提供图片上传托管、生成图片链接和常用图片工具箱服务。",
-    "text_2": "建议将本站添加到浏览器收藏夹，方便下次使用。",
-    "text_3": "如果 PicX 对你有帮助，欢迎赞赏作者，支持开源。",
-    "text_4": "郑重声明：请勿使用 PicX 上传违反你当地法律的图片，所造成的一切后果与作者无关。"
+    "section_overview": "概览",
+    "section_quickstart": "快速开始",
+    "section_features": "功能",
+    "section_links": "链接",
+    "section_disclaimer": "免责声明",
+    "desc": "Extious 的图床，基于 PicX 项目进行修改与优化，支持图片上传托管、生成图片链接，并内置常用图片处理工具。",
+    "bookmark": "建议将本站加入浏览器收藏夹，方便下次使用。",
+    "quick_1": "完成图床配置：登录后选择仓库、分支与目录。",
+    "quick_2": "上传图片：拖拽、粘贴或点击区域选择文件。",
+    "quick_3": "复制链接：上传成功后可一键复制图片链接。",
+    "quick_4": "个性化设置：在我的设置中配置命名、压缩、水印、链接规则等。",
+    "feature_1": "上传与托管：基于 GitHub 仓库进行内容托管。",
+    "feature_2": "图片压缩：多编码器可选，兼顾体积与兼容性。",
+    "feature_3": "水印添加：自定义文字、颜色、位置与透明度。",
+    "feature_4": "链接规则：自定义生成规则与多格式转换。",
+    "feature_5": "标签管理：为图片添加标签并支持筛选。",
+    "feature_6": "一键部署：支持 GitHub Pages 部署图床站点。",
+    "disclaimer": "请勿上传违反所在地区法律法规的图片，由此产生的后果由用户自行承担。"
   },
   "region": {
     "CN": "中国大陆",
@@ -254,7 +277,6 @@
   },
   "language": {
     "zh-CN": "中文简体",
-    "zh-TW": "中文繁体",
     "en": "英文"
   },
   "toggle_language_msg": "检测到你的 IP 所属地为{region}，是否切换{language}？",

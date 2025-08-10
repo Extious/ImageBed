@@ -33,19 +33,35 @@ export default function request(config: CustomAxiosRequestConfig): Promise<any> 
         }
       })
       .catch((err) => {
-        if (requestConfig?.success422 && err?.status === 422) {
-          resolve(err?.data || 'SUCCESS')
-        } else {
-          const code = err?.status
-          const msg = err?.data?.message
-          if (!requestConfig?.noShowErrorMsg) {
-            console.error('PicX Error // ', err)
-            if (code !== undefined && msg !== undefined) {
-              ElMessage.error({ duration: 6000, message: `Code: ${code}, Message: ${msg}` })
-            }
-          }
-          resolve(null)
+        // AxiosError 结构兼容：优先从 response 中取状态与数据
+        const response = err?.response
+        const code = response?.status
+        const data = response?.data
+        const msg = data?.message
+        const url = requestConfig?.url || ''
+
+        // 允许 422 走成功分支（GitHub Contents 乐观并发或重复 PUT）
+        if (requestConfig?.success422 && code === 422) {
+          resolve(data || 'SUCCESS')
+          return
         }
+
+        // 对 GitHub Contents 404 静默处理（常用于存在性校验与一致性等待）
+        if (code === 404 && /\/repos\/[^/]+\/[^/]+\/contents\//.test(url)) {
+          resolve(null)
+          return
+        }
+
+        if (!requestConfig?.noShowErrorMsg) {
+          console.error('Extious Error // ', err)
+          if (code !== undefined && msg !== undefined) {
+            ElMessage.error({ duration: 6000, message: `Code: ${code}, Message: ${msg}` })
+          } else if (!response) {
+            // 网络层错误或 CORS 失败（无响应）
+            ElMessage.error({ duration: 6000, message: 'Network error, please retry' })
+          }
+        }
+        resolve(null)
       })
   })
 }
