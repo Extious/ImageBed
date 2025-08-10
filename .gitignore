@@ -113,8 +113,7 @@ web_modules/
 .nuxt
 
 # Gatsby files
-.cache/
-public
+ .cache/
 
 # Storybook build outputs
 .out
