@@ -133,3 +133,6 @@ temp/
 *.njsproj
 *.sln
 *.sw?
+
+# allow lockfile
+!pnpm-lock.yaml
