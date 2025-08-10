@@ -2,7 +2,6 @@
   <div class="page-container login-container">
     <div class="left-box box-item">
       <el-button
-        plain
         type="primary"
         @click="onGitHubAuthorizeLogin"
         size="large"
@@ -26,7 +25,7 @@
       </div>
     </div>
     <div class="right-box box-item">
-      <el-button plain type="primary" size="large" @click="onUseTokenLogin">
+      <el-button type="primary" size="large" @click="onUseTokenLogin">
         {{ $t('authorization.text_2') }}
       </el-button>
       <div class="tips-box">

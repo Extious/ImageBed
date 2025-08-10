@@ -1,25 +1,72 @@
 .login-container {
   display grid
-  grid-gap 20rem
-  grid-template-rows repeat(1, 1fr)
-  grid-template-columns repeat(2, 1fr)
+  grid-gap 64rem
+  row-gap 64rem
+  grid-template-columns 1fr
+  justify-items stretch
+  align-items stretch
+  align-content start
+  min-height 'calc(100% - 64rem)'
+  max-width 800rem
+  margin 0 auto
+  padding 32rem 0
+  animation fadeInUp 0.6s ease-out
 
+  // 卡片化登录选项
   .box-item {
+    position relative
     display flex
     flex-direction column
+    align-items center
+    justify-content center
     width 100%
+    max-width 640rem
+    margin 0 auto
     height 100%
-    color var(--text-color-4)
-    background var(--background-color-2)
-    border-radius 12rem
+    min-height 220rem
+    padding 24rem
+    color var(--text-color-3)
+    background var(--background-color)
+    border-radius 16rem
+    border 1rem solid var(--border-color-light)
+    box-shadow var(--card-shadow)
+    transition all 0.25s cubic-bezier(0.4, 0, 0.2, 1)
+    backdrop-filter blur(8px)
+    z-index 1
+    will-change transform, box-shadow
+
+    &:hover {
+      transform translateY(-4rem)
+      box-shadow var(--card-shadow-hover)
+      z-index 5
+    }
+
+    // 去除顶部装饰圈，保证背景干净、对称
+
+    .el-button {
+      padding 14rem 22rem
+      font-size 16rem
+      border none
+      background linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end))
+      color #fff
+      box-shadow 0 6rem 16rem var(--ring-color)
+      transition transform 0.2s ease, box-shadow 0.2s ease
+
+      &:hover {
+        transform translateY(-2rem)
+        box-shadow 0 10rem 24rem var(--ring-color)
+      }
+    }
 
     .tips-box {
       display flex
       flex-direction column
       align-items center
       justify-content center
+      margin-top 12rem
       padding 10rem
       font-size 13rem
+      color var(--text-color-4)
 
       .tip-item {
         display flex
@@ -38,14 +85,24 @@
 
         &.link {
           color var(--el-color-primary)
-          font-weight bold
+          font-weight 600
           cursor pointer
+          transition color 0.15s ease
 
           &:hover {
-            border-bottom 1rem solid var(--el-color-primary)
+            color var(--brand-gradient-start)
+            text-decoration underline
           }
         }
       }
+    }
+  }
+
+  // 响应式
+  @media (max-width: 900px) {
+    max-width 92%
+    .box-item {
+      max-width 100%
     }
   }
 }
