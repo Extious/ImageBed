@@ -97,6 +97,8 @@ const initSettings: UserSettingsModel = {
   },
   // Commonly used tags
   commonTags: [],
+  // Default tags for new uploads
+  defaultTags: ['壁纸'],
   deploy: {
     github: {
       uuid: getUuid(),

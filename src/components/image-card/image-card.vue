@@ -269,6 +269,11 @@ const updateRename = async () => {
 
     if (base64) {
       const tmpImgObj: UploadImageModel = createUploadImageObject()
+      // 重命名重传：如果原图无标签，使用用户设置的默认标签
+      const defaults = (userSettings.defaultTags && userSettings.defaultTags.length > 0)
+        ? [...userSettings.defaultTags]
+        : ['壁纸']
+      tmpImgObj.tags = defaults
       tmpImgObj.uuid = newUuid
       tmpImgObj.base64.originalBase64 = base64
       tmpImgObj.filename.final = newFilename

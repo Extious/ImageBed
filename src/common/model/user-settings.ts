@@ -83,6 +83,8 @@ export interface UserSettingsModel {
   }
   // Commonly used tags for quick selection during upload
   commonTags: string[]
+  // Default tags automatically added to each new uploaded image
+  defaultTags: string[]
   deploy: {
     [key: string]: DeployStatusInfo
   }

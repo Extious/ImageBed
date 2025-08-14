@@ -27,7 +27,11 @@ export const generateUploadImageObject = (obj: {
   tmp.uuid = obj.uuid
   tmp.base64.originalBase64 = obj.base64
   tmp.fileInfo.originalFile = obj.file
-  tmp.tags = [] // 初始化标签为空数组
+  // 默认标签：优先读取设置中的 defaultTags，否则使用 ['壁纸']
+  const defaults = Array.isArray(userSettings.defaultTags) && userSettings.defaultTags.length > 0
+    ? [...userSettings.defaultTags]
+    : ['壁纸']
+  tmp.tags = defaults
 
   const { imageName } = userSettings
 

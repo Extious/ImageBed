@@ -131,6 +131,11 @@
       "title": "Common Tags",
       "desc": "Set commonly used tags for quick selection when uploading images"
     }
+    ,
+    "default_tags": {
+      "title": "Default Tags",
+      "desc": "These tags will be automatically added to new uploads"
+    }
   },
   "config": {
     "inputToken": "Please input GitHub Token ...",

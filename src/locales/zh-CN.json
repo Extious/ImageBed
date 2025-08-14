@@ -131,6 +131,11 @@
       "title": "常用标签",
       "desc": "设置常用标签，在上传图片时可快速选择"
     }
+    ,
+    "default_tags": {
+      "title": "默认标签",
+      "desc": "新上传图片将自动添加这些标签"
+    }
   },
   "config": {
     "inputToken": "请输入 GitHub Token ...",

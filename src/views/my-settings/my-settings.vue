@@ -182,6 +182,16 @@
           </li>
         </ul>
       </el-collapse-item>
+
+      <!-- 默认标签设置 -->
+      <el-collapse-item :title="$t('settings.default_tags.title')" name="9">
+        <ul class="setting-list">
+          <li class="setting-item has-desc">
+            <tag-input v-model="userSettings.defaultTags" @update:modelValue="persistUserSettings" />
+            <span class="desc">{{ $t('settings.default_tags.desc') }}</span>
+          </li>
+        </ul>
+      </el-collapse-item>
     </el-collapse>
   </div>
 </template>
