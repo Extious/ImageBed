@@ -7,6 +7,26 @@ import {
   isNeedWatermark
 } from '@/utils'
 
+// 严格时间戳（微秒）命名，单调递增，避免同毫秒冲突
+let lastEpochMicros = 0
+
+const nowMicros = (): number => {
+  if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+    const origin = (performance as any).timeOrigin || Date.now() - performance.now()
+    return Math.floor((origin + performance.now()) * 1000)
+  }
+  return Date.now() * 1000
+}
+
+export const generateUniqueTimestampFilename = (suffix: string): string => {
+  let ts = nowMicros()
+  if (ts <= lastEpochMicros) {
+    ts = lastEpochMicros + 1
+  }
+  lastEpochMicros = ts
+  return `${ts}.${suffix}`
+}
+
 /**
  * 前缀命名
  * @param isPrefix

@@ -171,7 +171,13 @@ import { UploadImageModel } from '@/common/model'
 import { useStore } from '@/stores'
 import { getFileSize } from '@/utils/file-utils'
 import { formatDatetime } from '@/utils/common-utils'
-import { hashRename, initImgSettings, prefixNamingTrans, rename } from './upload-image-card.util'
+import {
+  hashRename,
+  initImgSettings,
+  prefixNamingTrans,
+  rename,
+  generateUniqueTimestampFilename
+} from './upload-image-card.util'
 import { RENAME_MAX_LENGTH } from '@/common/constant'
 import TagInput from '@/components/tag-input/tag-input.vue'
 
@@ -232,7 +238,7 @@ const onTimestampNaming = (e: boolean) => {
   if (e) {
     fileNameOperateData.isHash = false
     fileNameOperateData.isPrefixNaming = false
-    props.imgObj!.filename.final = `${Date.now()}.${suffix}`
+    props.imgObj!.filename.final = generateUniqueTimestampFilename(suffix)
   } else {
     prefixNamingTrans(isPrefixNaming, props.imgObj)
     hashRename(isAddHash, props.imgObj)
