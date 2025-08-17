@@ -19,39 +19,118 @@ export const getUuid = () => {
 }
 
 /**
- * 复制文本到系统剪贴板
- * @param txt
- * @param callback
+ * 日志配置和工具函数
  */
-export const copyText = async (txt: string, callback?: () => void): Promise<boolean> => {
-  // 优先使用异步 Clipboard API，并在失败时回退到 execCommand
-  try {
-    // 某些浏览器在没有用户激活时会拒绝，此处捕获到后走回退逻辑
-    await navigator.clipboard.writeText(txt)
-    callback?.()
-    return true
-  } catch (_) {
+export const logger = {
+  // 开发环境下的日志
+  dev: (message: string, ...args: any[]) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[DEV] ${message}`, ...args)
+    }
+  },
+  
+  // 警告日志
+  warn: (message: string, ...args: any[]) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[WARN] ${message}`, ...args)
+    }
+  },
+  
+  // 错误日志
+  error: (message: string, ...args: any[]) => {
+    console.error(`[ERROR] ${message}`, ...args)
+  },
+  
+  // 静默日志（生产环境不输出）
+  silent: (message: string, ...args: any[]) => {
+    // 生产环境下不输出任何日志
+  }
+}
+
+/**
+ * 现代复制文本到系统剪贴板（推荐使用）
+ * @param txt 要复制的文本
+ * @param callback 复制成功后的回调
+ */
+export const copyTextModern = async (txt: string, callback?: () => void): Promise<boolean> => {
+  // 检查是否支持 Clipboard API
+  if (navigator.clipboard && window.isSecureContext) {
     try {
-      const textarea = document.createElement('textarea')
-      textarea.value = txt
-      textarea.setAttribute('readonly', '')
-      textarea.style.position = 'fixed'
-      textarea.style.top = '0'
-      textarea.style.left = '0'
-      textarea.style.opacity = '0'
-      document.body.appendChild(textarea)
-      textarea.select()
-      const ok = document.execCommand('copy')
-      document.body.removeChild(textarea)
-      if (ok) {
-        callback?.()
-        return true
-      }
-    } catch (_) {
-      // ignore
+      await navigator.clipboard.writeText(txt)
+      callback?.()
+      return true
+    } catch (error) {
+      console.warn('Clipboard API failed:', error)
+      return false
     }
   }
-  return false
+  
+  // 如果不支持 Clipboard API，使用 fallback 方法
+  return copyTextFallback(txt, callback)
+}
+
+/**
+ * 复制文本的 fallback 方法
+ * @param txt 要复制的文本
+ * @param callback 复制成功后的回调
+ */
+const copyTextFallback = (txt: string, callback?: () => void): boolean => {
+  try {
+    // 创建一个临时的 textarea 元素
+    const textarea = document.createElement('textarea')
+    textarea.value = txt
+    textarea.setAttribute('readonly', '')
+    textarea.style.position = 'absolute'
+    textarea.style.left = '-9999px'
+    textarea.style.top = '-9999px'
+    textarea.style.opacity = '0'
+    textarea.style.pointerEvents = 'none'
+    textarea.style.zIndex = '-1000'
+    
+    document.body.appendChild(textarea)
+    
+    // 使用现代的选择 API
+    const selection = window.getSelection()
+    if (selection) {
+      selection.removeAllRanges()
+      const range = document.createRange()
+      range.selectNodeContents(textarea)
+      selection.addRange(range)
+    }
+    
+    // 尝试使用现代的方法
+    try {
+      const successful = document.queryCommandSupported('copy')
+      if (successful) {
+        const result = document.execCommand('copy')
+        if (result) {
+          document.body.removeChild(textarea)
+          callback?.()
+          return true
+        }
+      }
+    } catch (e) {
+      // 忽略 execCommand 错误，使用静默日志
+      logger.silent('execCommand copy failed:', e)
+    }
+    
+    // 清理
+    document.body.removeChild(textarea)
+    return false
+  } catch (error) {
+    logger.warn('Fallback copy method failed:', error)
+    return false
+  }
+}
+
+/**
+ * 复制文本到系统剪贴板（向后兼容）
+ * @param txt 要复制的文本
+ * @param callback 复制成功后的回调
+ * @deprecated 建议使用 copyTextModern 函数
+ */
+export const copyText = async (txt: string, callback?: () => void): Promise<boolean> => {
+  return copyTextModern(txt, callback)
 }
 
 /**

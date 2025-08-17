@@ -203,6 +203,7 @@ $card-gap = 20rem
         gap $card-gap
         scroll-behavior smooth
         z-index 1
+        will-change auto
 
         // 强制换行分隔符（用于将目录与图片分隔到新行）
         > div {
@@ -257,6 +258,7 @@ $card-gap = 20rem
           animation imageItemFadeInUp 0.5s ease forwards
           opacity 0
           min-width 0
+          will-change auto
         }
 
         @keyframes imageItemFadeInUp {

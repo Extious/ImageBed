@@ -182,7 +182,7 @@ export async function initializeTagsData(userConfigInfo: UserConfigInfoModel): P
     }
     // 检查用户配置是否完整
     if (!userConfigInfo.owner || !userConfigInfo.selectedRepo || !userConfigInfo.token) {
-      console.log('User config incomplete, skipping tags initialization')
+      // 静默跳过，不输出警告日志
       return
     }
     tagsInitPromise = (async () => {

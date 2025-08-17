@@ -16,7 +16,11 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   return {
     plugins: createVitePlugins(viteEnv, isBuild),
     define: {
-      'process.env.NODE_ENV': JSON.stringify(mode)
+      'process.env.NODE_ENV': JSON.stringify(mode),
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+      __VUE_PROD_DEVTOOLS__: false,
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_TIPS__: false
     },
     resolve: {
       alias: [
@@ -68,13 +72,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       ],
       esbuildOptions: {
         sourcemap: false,
-        format: 'esm'
+        format: 'esm',
+        target: 'es2020'
       },
-      include: [],
-      force: true
-    },
-    ssr: {
-      noExternal: ['@yireen/squoosh-browser']
+      include: []
     },
     server: {
       port: 4000,
